@@ -1,0 +1,198 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light — soft premium palette */
+    --background: 150 16% 97%;
+    --foreground: 232 28% 18%;
+    --card: 0 0% 100%;
+    --card-foreground: 232 28% 18%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 232 28% 18%;
+    --primary: 157 58% 27%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 36% 92%;
+    --secondary-foreground: 232 28% 22%;
+    --muted: 150 12% 93%;
+    --muted-foreground: 232 10% 40%;
+    --accent: 61 64% 56%;
+    --accent-foreground: 232 28% 18%;
+    --warning: 61 64% 45%;
+    --warning-foreground: 232 28% 18%;
+    --destructive: 4 76% 56%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 150 12% 90%;
+    --input: 150 12% 90%;
+    --ring: 157 58% 27%;
+    --glass: 0 0% 100%;
+    --glass-border: 0 0% 100%;
+    --glass-highlight: 0 0% 100%;
+    --glow: 157 58% 40%;
+    --shadow: 232 28% 18%;
+    --radius: 1.5rem;
+    --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 232 28% 18%;
+    --sidebar-primary: 157 58% 27%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 226 36% 92%;
+    --sidebar-accent-foreground: 232 28% 22%;
+    --sidebar-border: 150 12% 90%;
+    --sidebar-ring: 157 58% 27%;
+    --chart-1: 157 58% 35%;
+    --chart-2: 61 64% 56%;
+    --chart-3: 226 36% 60%;
+    --chart-4: 180 55% 45%;
+    --chart-5: 280 50% 58%;
+  }
+
+  .dark {
+    /* Dark — depth, soft green ambient, no neon */
+    --background: 0 0% 2%;
+    --foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 0% 8%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 157 58% 36%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 92%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 74%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 100%;
+    --warning: 61 64% 56%;
+    --warning-foreground: 0 0% 8%;
+    --destructive: 4 74% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 100%;
+    --input: 0 0% 14%;
+    --ring: 157 58% 36%;
+    --glass: 0 0% 100%;
+    --glass-border: 0 0% 100%;
+    --glass-highlight: 0 0% 100%;
+    --glow: 157 70% 45%;
+    --shadow: 0 0% 0%;
+    --radius: 1.5rem;
+    --sidebar-background: 0 0% 5%;
+    --sidebar-foreground: 0 0% 92%;
+    --sidebar-primary: 157 58% 36%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 92%;
+    --sidebar-border: 0 0% 100%;
+    --sidebar-ring: 157 58% 36%;
+    --chart-1: 157 58% 45%;
+    --chart-2: 61 64% 56%;
+    --chart-3: 142 71% 50%;
+    --chart-4: 180 55% 50%;
+    --chart-5: 280 50% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-background text-foreground font-body antialiased;
+    font-feature-settings: "cv11", "ss01";
+  }
+  h1, h2, h3, h4 { @apply font-heading tracking-tight; }
+}
+
+@layer components {
+  /* Apple Liquid Glass — frosted, layered, soft white edge highlight */
+  .glass {
+    background: hsl(var(--glass) / 0.6);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid hsl(var(--glass-border) / 0.5);
+    box-shadow: inset 0 1px 1px 0 hsl(var(--glass-highlight) / 0.55),
+                inset 0 0 0 0.5px hsl(var(--glass-highlight) / 0.2),
+                0 8px 32px -12px hsl(var(--shadow) / 0.18);
+  }
+  .dark .glass {
+    background: hsl(var(--glass) / 0.05);
+    border: 1px solid hsl(var(--glass-border) / 0.08);
+    box-shadow: inset 0 1px 1px 0 hsl(var(--glass-highlight) / 0.08),
+                inset 0 0 0 0.5px hsl(var(--glass-highlight) / 0.05),
+                0 8px 32px -12px hsl(0 0% 0% / 0.6);
+  }
+  .glass-strong {
+    background: hsl(var(--glass) / 0.78);
+    backdrop-filter: blur(40px) saturate(200%);
+    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    border: 1px solid hsl(var(--glass-border) / 0.6);
+    box-shadow: inset 0 1px 1px 0 hsl(var(--glass-highlight) / 0.65),
+                inset 0 0 0 0.5px hsl(var(--glass-highlight) / 0.25),
+                0 12px 40px -12px hsl(var(--shadow) / 0.22);
+  }
+  .dark .glass-strong {
+    background: hsl(var(--glass) / 0.08);
+    border: 1px solid hsl(var(--glass-border) / 0.1);
+    box-shadow: inset 0 1px 1px 0 hsl(var(--glass-highlight) / 0.1),
+                inset 0 0 0 0.5px hsl(var(--glass-highlight) / 0.06),
+                0 12px 40px -12px hsl(0 0% 0% / 0.7);
+  }
+  .glow-ring {
+    box-shadow: 0 0 0 1px hsl(var(--glow) / 0.25), 0 8px 40px -8px hsl(var(--glow) / 0.4);
+  }
+  .voice-glow {
+    box-shadow: 0 0 30px -2px hsl(var(--glow) / 0.7), 0 0 60px -10px hsl(var(--glow) / 0.45);
+  }
+  .ambient-glow {
+    background: radial-gradient(60% 50% at 50% 0%, hsl(var(--glow) / 0.12), transparent 70%);
+  }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .tap-target { @apply min-h-[44px] min-w-[44px]; }
+}
+
+@layer utilities {
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px -4px hsl(var(--glow) / 0.5), 0 0 40px -8px hsl(var(--glow) / 0.3); transform: scale(1); }
+    50% { box-shadow: 0 0 35px 0px hsl(var(--glow) / 0.75), 0 0 70px -6px hsl(var(--glow) / 0.5); transform: scale(1.04); }
+  }
+  @keyframes float-soft {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes orb-pulse {
+    0% { transform: scale(0.95); opacity: 0.7; }
+    50% { transform: scale(1.15); opacity: 0; }
+    100% { transform: scale(0.95); opacity: 0; }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  @keyframes slide-down {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes page-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-pulse-glow { animation: pulse-glow 2.4s ease-in-out infinite; }
+  .animate-float-soft { animation: float-soft 4s ease-in-out infinite; }
+  .animate-orb-pulse { animation: orb-pulse 2s ease-out infinite; }
+  .animate-fade-up { animation: fade-up 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-slide-in-right { animation: slide-in-right 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .animate-page-in { animation: page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+}
