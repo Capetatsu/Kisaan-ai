@@ -2,7 +2,7 @@
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const getToken = () => {
-  return localStorage.getItem('base44_access_token') || localStorage.getItem('token') || '';
+  return localStorage.getItem('kisaan_token') || localStorage.getItem('base44_access_token') || localStorage.getItem('token') || '';
 };
 
 const request = async (path, options = {}) => {

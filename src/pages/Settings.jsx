@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import Toggle from '@/components/ui/Toggle';
 import PageHeader from '@/components/layout/PageHeader';
-import { Moon, Sun, Globe, User, Bell, Volume2, Database } from 'lucide-react';
+import { Moon, Sun, Globe, User, Bell, Volume2, Database, LogOut, Hash, Mail } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { useTheme } from '@/lib/themeContext';
 import { useSenior } from '@/lib/seniorContext';
+import { useAuth } from '@/lib/AuthContext';
 
 function Row({ Icon, label, children }) {
   return (
@@ -21,12 +22,45 @@ export default function Settings() {
   const { t, lang, setLang } = useLang();
   const { theme, toggleTheme } = useTheme();
   const { seniorMode, setSeniorMode } = useSenior();
+  const { user, logout } = useAuth();
   const [notif, setNotif] = useState(true);
   const [voice, setVoice] = useState(true);
 
   return (
     <div className="space-y-4">
       <PageHeader title={t('settings')} />
+
+      {/* Profile section */}
+      <GlassCard strong className="p-5 animate-fade-up">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="grid place-items-center h-14 w-14 rounded-2xl bg-primary text-primary-foreground shrink-0">
+            <User className="h-7 w-7" />
+          </span>
+          <div className="min-w-0">
+            <p className="font-bold text-lg truncate">{user?.username || 'Farmer'}</p>
+            <p className="text-xs text-muted-foreground truncate">{user?.email || ''}</p>
+          </div>
+        </div>
+        <div className="space-y-2.5">
+          <div className="flex items-center gap-2 text-sm">
+            <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-muted-foreground">Unique ID:</span>
+            <span className="font-mono font-bold text-primary">#{user?.id || '—'}</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+            <span className="text-muted-foreground truncate">{user?.email || 'Not logged in'}</span>
+          </div>
+        </div>
+        <button
+          onClick={logout}
+          className="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-xl bg-destructive/10 text-destructive font-semibold text-sm active:scale-95 transition-transform"
+        >
+          <LogOut className="h-4 w-4" />
+          {t('sign_out')}
+        </button>
+      </GlassCard>
+
       <GlassCard className="p-4 divide-y divide-border animate-fade-up">
         <Row Icon={theme === 'dark' ? Moon : Sun} label={theme === 'dark' ? 'Dark mode' : 'Light mode'}>
           <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
