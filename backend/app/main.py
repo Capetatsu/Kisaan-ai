@@ -7,6 +7,7 @@ from app.api.v1.auth import router as auth_router
 from app.api.v1.users import router as users_router
 from app.api.v1.farms import router as farms_router
 from app.api.v1.crops import router as crops_router
+from app.api.v1.insights import router as insights_router
 
 from app.core.exception_handlers import register_exception_handlers
 from app.core.config import settings
@@ -32,6 +33,7 @@ app.include_router(auth_router)
 app.include_router(users_router)
 app.include_router(farms_router)
 app.include_router(crops_router)
+app.include_router(insights_router)
 
 
 @app.get("/")

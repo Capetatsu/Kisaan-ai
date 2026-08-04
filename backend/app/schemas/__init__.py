@@ -16,3 +16,8 @@ from .crop import (
     CropUpdate,
     CropResponse,
 )
+
+from .ai import (
+    AIQuery,
+    AIResponse,
+)
