@@ -4,94 +4,104 @@ from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.dependencies.auth import get_current_user
 from app.models.user import User
-from app.schemas.farm import (
-    FarmCreate,
-    FarmUpdate,
-    FarmResponse,
+from app.schemas.crop import (
+    CropCreate,
+    CropUpdate,
+    CropResponse,
 )
-from app.services.farm_service import FarmService
+from app.services.crop_service import CropService
 
 router = APIRouter(
-    prefix="/farms",
-    tags=["Farms"],
+    prefix="/farms/{farm_id}/crops",
+    tags=["Crops"],
 )
 
 
 @router.post(
     "",
-    response_model=FarmResponse,
+    response_model=CropResponse,
     status_code=201,
 )
-def create_farm(
-    farm: FarmCreate,
+def create_crop(
+    farm_id: int,
+    crop: CropCreate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return FarmService.create_farm(
+    return CropService.create_crop(
         db,
-        farm,
+        farm_id,
+        crop,
         current_user,
     )
 
 
 @router.get(
     "",
-    response_model=list[FarmResponse],
+    response_model=list[CropResponse],
 )
-def get_farms(
+def get_crops(
+    farm_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return FarmService.get_farms(
+    return CropService.get_crops(
         db,
+        farm_id,
         current_user,
     )
 
 
 @router.get(
-    "/{farm_id}",
-    response_model=FarmResponse,
+    "/{crop_id}",
+    response_model=CropResponse,
 )
-def get_farm(
+def get_crop(
     farm_id: int,
+    crop_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return FarmService.get_farm(
+    return CropService.get_crop(
         db,
         farm_id,
+        crop_id,
         current_user,
     )
 
 
 @router.put(
-    "/{farm_id}",
-    response_model=FarmResponse,
+    "/{crop_id}",
+    response_model=CropResponse,
 )
-def update_farm(
+def update_crop(
     farm_id: int,
-    farm_update: FarmUpdate,
+    crop_id: int,
+    crop_update: CropUpdate,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return FarmService.update_farm(
+    return CropService.update_crop(
         db,
         farm_id,
-        farm_update,
+        crop_id,
+        crop_update,
         current_user,
     )
 
 
 @router.delete(
-    "/{farm_id}",
+    "/{crop_id}",
 )
-def delete_farm(
+def delete_crop(
     farm_id: int,
+    crop_id: int,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
-    return FarmService.delete_farm(
+    return CropService.delete_crop(
         db,
         farm_id,
+        crop_id,
         current_user,
     )
