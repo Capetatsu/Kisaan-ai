@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import StatusChip from '@/components/ui/StatusChip';
 import PageHeader from '@/components/layout/PageHeader';
 import { TrendingUp, TrendingDown, Minus, MapPin, Clock, BadgeIndianRupee, ArrowRight } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
-import { marketData, nearbyMandi } from '@/lib/mockData';
+import { api } from '@/lib/api';
 
 const trendIcon = { up: TrendingUp, down: TrendingDown, flat: Minus };
 const trendColor = { up: 'text-primary', down: 'text-destructive', flat: 'text-muted-foreground' };
@@ -13,8 +13,54 @@ const suggTone = { sell: 'green', hold: 'amber', buy: 'accent' };
 export default function Market() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
-  const [activeId, setActiveId] = useState(marketData[2].id);
-  const active = marketData.find((m) => m.id === activeId);
+  const [marketData, setMarketData] = useState([]);
+  const [nearbyMandi, setNearbyMandi] = useState({ name: 'Sanwer Mandi', distance: '8 km', open: true });
+  const [activeId, setActiveId] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [prices, mandi] = await Promise.all([
+          api.getMarketPrices(),
+          api.getNearbyMandi(),
+        ]);
+        setMarketData(prices);
+        setNearbyMandi(mandi);
+        if (prices.length > 0) setActiveId(prices[2]?.id || prices[0].id);
+      } catch (e) {
+        console.error('Failed to load market data:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, []);
+
+  const active = marketData.find((m) => m.id === activeId) || marketData[0];
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={t('nav_market')} subtitle={nearbyMandi.name} />
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!active) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={t('nav_market')} subtitle={nearbyMandi.name} />
+        <GlassCard className="p-6 text-center">
+          <p className="text-sm text-muted-foreground">{isHindi ? 'कोई मंडी डेटा उपलब्ध नहीं' : 'No market data available'}</p>
+        </GlassCard>
+      </div>
+    );
+  }
+
   const TrendIcon = trendIcon[active.trend];
 
   return (

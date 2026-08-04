@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import StatusChip from '@/components/ui/StatusChip';
 import PageHeader from '@/components/layout/PageHeader';
 import { Sprout, Droplets, Bug, ArrowRight, Camera, Droplet, Cloud, Scissors, Leaf } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { Image } from '@/components/ui/image';
-import { crops } from '@/lib/mockData';
+import { api } from '@/lib/api';
 
 const waterTone = { low: 'green', medium: 'amber', high: 'red' };
 const diseaseTone = { low: 'green', medium: 'amber', high: 'red' };
@@ -17,11 +17,100 @@ const quickActions = [
   { key: 'harvest_soon', Icon: Scissors, tone: 'green' },
 ];
 
+const cropEmojis = {
+  wheat: '🌾', tomato: '🍅', onion: '🧅', soybean: '🫘',
+  rice: '🌾', maize: '🌽', cotton: '🌿', sugarcane: '🎋',
+  potato: '🥔', chilli: '🌶️', mustard: '🌼', groundnut: '🥜',
+};
+
+const cropEmojisHi = {
+  गेहूं: '🌾', टमाटर: '🍅', प्याज: '🧅', सोयाबीन: '🫘',
+  चावल: '🌾', मक्का: '🌽', कपास: '🌿', गन्ना: '🎋',
+  आलू: '🥔', मिर्च: '🌶️', सरसों: '🌼', मूंगफली: '🥜',
+};
+
 export default function Crops() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
-  const [activeId, setActiveId] = useState(crops[1].id);
+  const [crops, setCrops] = useState([]);
+  const [activeId, setActiveId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(false);
+
+  useEffect(() => {
+    const loadCrops = async () => {
+      try {
+        const farms = await api.getFarms();
+        if (farms.length === 0) {
+          setCrops([]);
+          return;
+        }
+        const allCrops = [];
+        for (const farm of farms) {
+          const farmCrops = await api.getCrops(farm.id);
+          allCrops.push(...farmCrops.map((c) => ({
+            ...c,
+            farmId: farm.id,
+            emoji: cropEmojis[c.name.toLowerCase()] || cropEmojisHi[c.name] || '🌱',
+            health: c.status === 'HARVESTED' ? 100 : c.status === 'GROWING' ? 75 : 50,
+            water: c.status === 'HARVESTED' ? 'low' : 'medium',
+            disease: c.status === 'GROWING' ? 'low' : 'medium',
+            nextAction: c.status === 'PLANTED' ? 'Water now' : c.status === 'GROWING' ? 'Check leaf' : 'Harvest soon',
+            stage: c.status,
+          })));
+        }
+        setCrops(allCrops);
+        if (allCrops.length > 0) setActiveId(allCrops[0].id);
+      } catch (e) {
+        console.error('Failed to load crops:', e);
+        if (e.message && e.message.includes('401')) {
+          setAuthError(true);
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadCrops();
+  }, []);
+
   const active = crops.find((c) => c.id === activeId);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={t('my_crops')} subtitle={isHindi ? 'फसलें सक्रिय' : 'crops active'} />
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (authError) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={t('my_crops')} subtitle={isHindi ? 'लॉगिन आवश्यक' : 'login required'} />
+        <GlassCard className="p-6 text-center">
+          <Sprout className="h-8 w-8 text-primary mx-auto mb-2" />
+          <p className="text-sm font-semibold">{isHindi ? 'लॉगिन करें' : 'Please login'}</p>
+          <p className="text-xs text-muted-foreground mt-1">{isHindi ? 'अपनी फसलें देखने के लिए लॉगिन करें' : 'Login to view your crops and farms'}</p>
+        </GlassCard>
+      </div>
+    );
+  }
+
+  if (crops.length === 0) {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={t('my_crops')} subtitle={isHindi ? 'कोई फसल नहीं' : 'no crops'} />
+        <GlassCard className="p-6 text-center">
+          <Sprout className="h-8 w-8 text-primary mx-auto mb-2" />
+          <p className="text-sm font-semibold">{isHindi ? 'अभी कोई फसल नहीं' : 'No crops yet'}</p>
+          <p className="text-xs text-muted-foreground mt-1">{isHindi ? 'पहले एक फार्म बनाएं और फसल जोड़ें' : 'Create a farm first, then add crops'}</p>
+        </GlassCard>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
@@ -34,7 +123,7 @@ export default function Crops() {
             className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all tap-target
               ${c.id === activeId ? 'bg-primary text-primary-foreground' : 'glass text-foreground'}`}>
             <span>{c.emoji}</span>
-            {isHindi ? c.nameHi : c.name}
+            {c.name}
           </button>
         ))}
       </div>
@@ -53,7 +142,7 @@ export default function Crops() {
             <div className="flex items-center gap-2.5 min-w-0">
               <span className="text-3xl drop-shadow-lg shrink-0">{active.emoji}</span>
               <div className="min-w-0">
-                <h2 className="text-xl font-bold font-heading text-white drop-shadow truncate">{isHindi ? active.nameHi : active.name}</h2>
+                <h2 className="text-xl font-bold font-heading text-white drop-shadow truncate">{active.name}</h2>
                 <p className="text-xs text-white/80 drop-shadow">{active.stage}</p>
               </div>
             </div>
@@ -95,7 +184,7 @@ export default function Crops() {
         </span>
         <div className="flex-1">
           <p className="text-xs text-muted-foreground">{t('next_action')}</p>
-          <p className="font-bold">{isHindi && active.nextAction === 'Check leaf' ? 'पत्ती जांचें' : active.nextAction}</p>
+          <p className="font-bold">{active.nextAction}</p>
         </div>
         <StatusChip tone={diseaseTone[active.disease]} pulse>{t(active.disease)} {isHindi ? 'जोखिम' : 'risk'}</StatusChip>
       </GlassCard>

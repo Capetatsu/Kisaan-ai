@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import RecommendationCard from '@/components/ui/RecommendationCard';
 import StatusChip from '@/components/ui/StatusChip';
@@ -7,7 +7,8 @@ import VoiceButton from '@/components/layout/VoiceButton';
 import { Image } from '@/components/ui/image';
 import { CloudRain, Droplets, Wind, TrendingUp, Landmark, AlertTriangle, RotateCcw, ChevronRight } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
-import { farmer, weather, aiRecommendation, crops, marketData, schemes } from '@/lib/mockData';
+import { farmer, crops, schemes } from '@/lib/mockData';
+import { api } from '@/lib/api';
 import { Link } from 'react-router-dom';
 
 function greetingKey() {
@@ -21,7 +22,50 @@ export default function Home() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
   const mainCrop = crops[1];
-  const topMarket = marketData[2];
+  const [weather, setWeather] = useState(null);
+  const [marketData, setMarketData] = useState([]);
+  const [aiRec, setAiRec] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [weatherData, marketPrices] = await Promise.all([
+          api.getWeather(),
+          api.getMarketPrices(),
+        ]);
+        setWeather(weatherData);
+        setMarketData(marketPrices);
+
+        // Get AI recommendation
+        try {
+          const rec = await api.askAI({
+            question: 'What should I do for my crops today?',
+            language: lang,
+          });
+          setAiRec({
+            title: rec.action.split('.')[0],
+            titleHi: rec.action.split('.')[0],
+            reason: rec.reason,
+            reasonHi: rec.reason,
+            confidence: rec.confidence,
+            action: 'View why',
+            tone: 'wait',
+          });
+        } catch (e) {
+          // AI fallback - use mock
+          setAiRec(null);
+        }
+      } catch (e) {
+        console.error('Failed to load home data:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [lang]);
+
+  const topMarket = marketData[2] || { emoji: '🧅', crop: 'Onion', cropHi: 'प्याज', price: 3120, change: 8.4 };
 
   return (
     <div className="relative">
@@ -53,7 +97,7 @@ export default function Home() {
           <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
             <div>
               <p className="text-[11px] font-semibold text-white/80">{t('weather_today')}</p>
-              <p className="text-2xl font-bold font-heading text-white">{weather.temp}° <span className="text-sm font-medium">{isHindi ? weather.conditionHi : weather.condition}</span></p>
+              <p className="text-2xl font-bold font-heading text-white">{weather?.temp ?? 31}° <span className="text-sm font-medium">{isHindi ? (weather?.conditionHi ?? 'बारिश संभावित') : (weather?.condition ?? 'Rain expected')}</span></p>
             </div>
             <span className="grid place-items-center h-12 w-12 rounded-2xl glass text-white animate-float-soft">
               <CloudRain className="h-6 w-6" />
@@ -64,23 +108,23 @@ export default function Home() {
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <Droplets className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">{t('weather')}</p>
-            <p className="text-sm font-bold">{weather.rainChance}%</p>
+            <p className="text-sm font-bold">{weather?.rainChance ?? 78}%</p>
           </div>
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <CloudRain className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">Humidity</p>
-            <p className="text-sm font-bold">{weather.humidity}%</p>
+            <p className="text-sm font-bold">{weather?.humidity ?? 82}%</p>
           </div>
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <Wind className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">Wind</p>
-            <p className="text-sm font-bold">{weather.wind} km</p>
+            <p className="text-sm font-bold">{weather?.wind ?? 12} km</p>
           </div>
         </div>
       </GlassCard>
 
       {/* Main AI recommendation */}
-      <RecommendationCard rec={aiRecommendation} isHindi={isHindi} />
+      {aiRec && <RecommendationCard rec={aiRec} isHindi={isHindi} />}
 
       {/* Continue last — compact */}
       <GlassCard className="p-3.5 flex items-center gap-3 animate-fade-up">
