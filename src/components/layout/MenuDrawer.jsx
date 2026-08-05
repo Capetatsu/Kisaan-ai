@@ -2,7 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   X, Bell, MapPin, BadgeCheck, FileText, BarChart3, Download, Settings as Cog,
-  Info, HelpCircle, Moon, Sun, Globe, User, LogOut
+  Info, HelpCircle, Moon, Sun, Globe, User, LogOut, Sprout
 } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { useTheme } from '@/lib/themeContext';
@@ -12,6 +12,7 @@ import OfflineIndicator from '@/components/ui/OfflineIndicator';
 import StatusChip from '@/components/ui/StatusChip';
 
 const menuItems = [
+  { to: '/farms', key: 'farms', Icon: Sprout },
   { to: '/offline-downloads', key: 'offline_downloads', Icon: Download },
   { to: '/reports', key: 'reports', Icon: FileText },
   { to: '/village-status', key: 'village_status', Icon: MapPin },

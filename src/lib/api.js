@@ -5,6 +5,31 @@ const getToken = () => {
   return localStorage.getItem('kisaan_token') || localStorage.getItem('base44_access_token') || localStorage.getItem('token') || '';
 };
 
+const buildError = (detail) => {
+  if (Array.isArray(detail)) {
+    // FastAPI 422 validation error: detail is an array of { loc, msg }
+    return detail
+      .map((item) => {
+        const field = Array.isArray(item.loc)
+          ? item.loc.filter((p) => p !== 'body').join('.')
+          : '';
+        const label = field ? `${field}: ` : '';
+        return `${label}${item.msg || 'Invalid value'}`;
+      })
+      .join('. ');
+  }
+  if (typeof detail === 'string') {
+    return detail;
+  }
+  return 'Something went wrong. Please try again.';
+};
+
+const clearStoredToken = () => {
+  localStorage.removeItem('kisaan_token');
+  localStorage.removeItem('base44_access_token');
+  localStorage.removeItem('token');
+};
+
 const request = async (path, options = {}) => {
   const token = getToken();
   const headers = {
@@ -13,14 +38,28 @@ const request = async (path, options = {}) => {
     ...options.headers,
   };
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  let response;
+  try {
+    response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+    });
+  } catch (e) {
+    throw new Error('Network error. Check your internet connection and try again.');
+  }
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
-    throw new Error(error.detail || `Request failed: ${response.status}`);
+
+    if (response.status === 401) {
+      clearStoredToken();
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
+      throw new Error('Your session has expired. Please log in again.');
+    }
+
+    throw new Error(buildError(error.detail) || `Request failed: ${response.status}`);
   }
 
   return response.json();

@@ -12,6 +12,8 @@ import AppLayout from '@/components/layout/AppLayout';
 // Pages
 import Home from '@/pages/Home';
 import Crops from '@/pages/Crops';
+import Farms from '@/pages/Farms';
+import FarmDetail from '@/pages/FarmDetail';
 import Market from '@/pages/Market';
 import AI from '@/pages/AI';
 import VillageStatus from '@/pages/VillageStatus';
@@ -51,6 +53,8 @@ const AuthenticatedApp = () => {
     <Routes>
       <Route element={<AppLayout />}>
         <Route path="/" element={<Home />} />
+        <Route path="/farms" element={<Farms />} />
+        <Route path="/farms/:farmId" element={<FarmDetail />} />
         <Route path="/crops" element={<Crops />} />
         <Route path="/market" element={<Market />} />
         <Route path="/ai" element={<AI />} />
