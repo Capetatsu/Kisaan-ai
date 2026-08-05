@@ -39,6 +39,7 @@ const translations = {
     enabled: 'On', disabled: 'Off', open: 'Open', close: 'Close', tap_to_speak: 'Tap to speak',
     search_language: 'Search language', sign_out: 'Sign out', dark: 'Dark', light: 'Light',
     farm_assistant: 'Your farm assistant',
+    farms: 'My farms',
   },
   hi: {
     nav_home: 'होम', nav_crops: 'फसल', nav_market: 'मंडी', nav_ai: 'एआई', nav_menu: 'मेन्यू',
@@ -68,6 +69,7 @@ const translations = {
     enabled: 'चालू', disabled: 'बंद', open: 'खोलें', close: 'बंद करें', tap_to_speak: 'बोलने के लिए टैप करें',
     search_language: 'भाषा खोजें', sign_out: 'साइन आउट', dark: 'डार्क', light: 'लाइट',
     farm_assistant: 'आपका किसान सहायक',
+    farms: 'मेरे फार्म',
   },
   mr: {
     nav_home: 'होम', nav_crops: 'पीक', nav_market: 'बाजार', nav_ai: 'एआय', nav_menu: 'मेन्यू',
@@ -97,6 +99,7 @@ const translations = {
     enabled: 'चालू', disabled: 'बंद', open: 'उघडा', close: 'बंद करा', tap_to_speak: 'बोलण्यासाठी टॅप करा',
     search_language: 'भाषा शोधा', sign_out: 'साइन आउट', dark: 'डार्क', light: 'लाइट',
     farm_assistant: 'तुमचा शेतकरी सहाय्यक',
+    farms: 'माझे फार्म',
   },
   gu: {
     nav_home: 'હોમ', nav_crops: 'પાક', nav_market: 'બજાર', nav_ai: 'એઆઈ', nav_menu: 'મેનૂ',
@@ -126,6 +129,7 @@ const translations = {
     enabled: 'ચાલુ', disabled: 'બંધ', open: 'ખોલો', close: 'બંધ કરો', tap_to_speak: 'બોલવા માટે ટૅપ કરો',
     search_language: 'ભાષા શોધો', sign_out: 'સાઇન આઉટ', dark: 'ડાર્ક', light: 'લાઇટ',
     farm_assistant: 'તમારો ખેડૂત સહાયક',
+    farms: 'મારા ફાર્મ',
   },
   ta: {
     nav_home: 'முகப்பு', nav_crops: 'பயிர்', nav_market: 'சந்தை', nav_ai: 'ஏஐ', nav_menu: 'பட்டி',
@@ -155,6 +159,7 @@ const translations = {
     enabled: 'இயக்கம்', disabled: 'அணை', open: 'திறக்கவும்', close: 'மூடவும்', tap_to_speak: 'பேச தட்டவும்',
     search_language: 'மொழியைத் தேடவும்', sign_out: 'வெளியேறு', dark: 'டார்க்', light: 'லைட்',
     farm_assistant: 'உங்கள் விவசாய உதவியாளர்',
+    farms: 'என் பண்ணைகள்',
   },
   te: {
     nav_home: 'హోమ్', nav_crops: 'పంట', nav_market: 'మార్కెట్', nav_ai: 'ఏఐ', nav_menu: 'మెనూ',
@@ -184,6 +189,7 @@ const translations = {
     enabled: 'ఆన్', disabled: 'ఆఫ్', open: 'తెరవండి', close: 'మూసివేయండి', tap_to_speak: 'మాట్లాడటానికి ట్యాప్ చేయండి',
     search_language: 'భాష శోధించండి', sign_out: 'సైన్ అవుట్', dark: 'డార్క్', light: 'లైట్',
     farm_assistant: 'మీ వ్యవసాయ సహాయకుడు',
+    farms: 'నా పొలాలు',
   },
   bn: {
     nav_home: 'হোম', nav_crops: 'ফসল', nav_market: 'বাজার', nav_ai: 'এআই', nav_menu: 'মেনু',
@@ -213,6 +219,7 @@ const translations = {
     enabled: 'চালু', disabled: 'বন্ধ', open: 'খুলুন', close: 'বন্ধ করুন', tap_to_speak: 'কথা বলতে ট্যাপ করুন',
     search_language: 'ভাষা খুঁজুন', sign_out: 'সাইন আউট', dark: 'ডার্ক', light: 'লাইট',
     farm_assistant: 'আপনার কৃষি সহায়ক',
+    farms: 'আমার খামার',
   },
 };
 

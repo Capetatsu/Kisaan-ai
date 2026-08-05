@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import RecommendationCard from '@/components/ui/RecommendationCard';
 import StatusChip from '@/components/ui/StatusChip';
 import PageHeader from '@/components/layout/PageHeader';
 import VoiceButton from '@/components/layout/VoiceButton';
 import { Image } from '@/components/ui/image';
-import { CloudRain, Droplets, Wind, TrendingUp, Landmark, AlertTriangle, RotateCcw, ChevronRight } from 'lucide-react';
+import { CloudRain, Droplets, Wind, TrendingUp, Landmark, AlertTriangle, RotateCcw, ChevronRight, Sprout } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
-import { farmer, weather, aiRecommendation, crops, marketData, schemes } from '@/lib/mockData';
+import { farmer, schemes } from '@/lib/mockData';
+import { useAuth } from '@/lib/AuthContext';
+import { api } from '@/lib/api';
 import { Link } from 'react-router-dom';
 
 function greetingKey() {
@@ -20,13 +22,72 @@ function greetingKey() {
 export default function Home() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
-  const mainCrop = crops[1];
-  const topMarket = marketData[2];
+  const { user } = useAuth();
+  const [realCrops, setRealCrops] = useState([]);
+  const [realFarms, setRealFarms] = useState([]);
+  const mainCrop = realCrops[0] || null;
+  const [weather, setWeather] = useState(null);
+  const [marketData, setMarketData] = useState([]);
+  const [aiRec, setAiRec] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [weatherData, marketPrices, farms] = await Promise.all([
+          api.getWeather(),
+          api.getMarketPrices(),
+          api.getFarms(),
+        ]);
+        setWeather(weatherData);
+        setMarketData(marketPrices);
+        setRealFarms(farms);
+
+        const allCrops = [];
+        for (const farm of farms) {
+          try {
+            const farmCrops = await api.getCrops(farm.id);
+            allCrops.push(...farmCrops);
+          } catch (e) {
+            // ignore per-farm crop fetch errors on the dashboard
+          }
+        }
+        setRealCrops(allCrops);
+
+        // Get AI recommendation
+        try {
+          const rec = await api.askAI({
+            question: 'What should I do for my crops today?',
+            language: lang,
+          });
+          setAiRec({
+            title: rec.action.split('.')[0],
+            titleHi: rec.action.split('.')[0],
+            reason: rec.reason,
+            reasonHi: rec.reason,
+            confidence: rec.confidence,
+            action: 'View why',
+            tone: 'wait',
+          });
+        } catch (e) {
+          // AI fallback - use mock
+          setAiRec(null);
+        }
+      } catch (e) {
+        console.error('Failed to load home data:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [lang]);
+
+  const topMarket = marketData[2] || { emoji: '🧅', crop: 'Onion', cropHi: 'प्याज', price: 3120, change: 8.4 };
 
   return (
     <div className="relative">
       <div className="flex flex-col gap-4 animate-page-in pb-16">
-      <PageHeader title={`${t(greetingKey())}, ${farmer.name}`} subtitle={`${farmer.village} · ${farmer.district}`} />
+      <PageHeader title={`${t(greetingKey())}, ${user?.username || farmer.name}`} subtitle={realFarms.length ? `${realFarms.length} ${isHindi ? 'फार्म' : 'farms'} · ${realCrops.length} ${isHindi ? 'फसलें' : 'crops'}` : (farmer.village ? `${farmer.village} · ${farmer.district}` : '')} />
 
       {/* Emergency alert */}
       <GlassCard className="p-4 flex items-center gap-3 border-destructive/30 animate-fade-up">
@@ -53,7 +114,7 @@ export default function Home() {
           <div className="absolute bottom-3 left-4 right-4 flex items-end justify-between">
             <div>
               <p className="text-[11px] font-semibold text-white/80">{t('weather_today')}</p>
-              <p className="text-2xl font-bold font-heading text-white">{weather.temp}° <span className="text-sm font-medium">{isHindi ? weather.conditionHi : weather.condition}</span></p>
+              <p className="text-2xl font-bold font-heading text-white">{weather?.temp ?? 31}° <span className="text-sm font-medium">{isHindi ? (weather?.conditionHi ?? 'बारिश संभावित') : (weather?.condition ?? 'Rain expected')}</span></p>
             </div>
             <span className="grid place-items-center h-12 w-12 rounded-2xl glass text-white animate-float-soft">
               <CloudRain className="h-6 w-6" />
@@ -64,23 +125,23 @@ export default function Home() {
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <Droplets className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">{t('weather')}</p>
-            <p className="text-sm font-bold">{weather.rainChance}%</p>
+            <p className="text-sm font-bold">{weather?.rainChance ?? 78}%</p>
           </div>
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <CloudRain className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">Humidity</p>
-            <p className="text-sm font-bold">{weather.humidity}%</p>
+            <p className="text-sm font-bold">{weather?.humidity ?? 82}%</p>
           </div>
           <div className="text-center rounded-2xl bg-muted/50 py-2.5">
             <Wind className="h-3.5 w-3.5 text-primary mx-auto mb-0.5" />
             <p className="text-[10px] text-muted-foreground">Wind</p>
-            <p className="text-sm font-bold">{weather.wind} km</p>
+            <p className="text-sm font-bold">{weather?.wind ?? 12} km</p>
           </div>
         </div>
       </GlassCard>
 
       {/* Main AI recommendation */}
-      <RecommendationCard rec={aiRecommendation} isHindi={isHindi} />
+      {aiRec && <RecommendationCard rec={aiRec} isHindi={isHindi} />}
 
       {/* Continue last — compact */}
       <GlassCard className="p-3.5 flex items-center gap-3 animate-fade-up">
@@ -95,26 +156,39 @@ export default function Home() {
       </GlassCard>
 
       {/* Crop status */}
-      <Link to="/crops">
-        <GlassCard className="p-4 animate-fade-up">
-          <div className="flex items-center justify-between mb-3">
-            <p className="text-xs font-semibold text-muted-foreground">{t('crop_status')}</p>
-            <StatusChip tone={mainCrop.disease === 'high' ? 'red' : 'green'} pulse>{mainCrop.disease === 'high' ? t('high') : t('low')} {isHindi ? 'जोखिम' : 'risk'}</StatusChip>
-          </div>
-          <div className="flex items-end gap-3">
-            <span className="text-3xl">{mainCrop.emoji}</span>
-            <div className="flex-1 space-y-2">
-              <p className="font-bold">{isHindi ? mainCrop.nameHi : mainCrop.name} <span className="text-muted-foreground font-medium">· {mainCrop.stage}</span></p>
-              <div className="h-2 rounded-full bg-muted overflow-hidden">
-                <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${mainCrop.health}%` }} />
-              </div>
+      {mainCrop ? (
+        <Link to="/crops">
+          <GlassCard className="p-4 animate-fade-up">
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-xs font-semibold text-muted-foreground">{t('crop_status')}</p>
+              <StatusChip tone={mainCrop.status === 'HARVESTED' ? 'green' : mainCrop.status === 'GROWING' ? 'amber' : 'muted'}>{mainCrop.status}</StatusChip>
             </div>
-            <span className="text-lg font-bold text-primary self-end pb-0.5">
-              {mainCrop.health}%
+            <div className="flex items-end gap-3">
+              <span className="text-3xl">🌱</span>
+              <div className="flex-1 space-y-2">
+                <p className="font-bold">{mainCrop.name} <span className="text-muted-foreground font-medium">· {mainCrop.season}</span></p>
+                <div className="h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${mainCrop.status === 'HARVESTED' ? 100 : mainCrop.status === 'GROWING' ? 75 : 40}%` }} />
+                </div>
+              </div>
+              <span className="text-[10px] text-muted-foreground self-end pb-0.5">Planted {mainCrop.planted_at}</span>
+            </div>
+          </GlassCard>
+        </Link>
+      ) : (
+        <Link to="/farms">
+          <GlassCard className="p-4 flex items-center gap-3 animate-fade-up">
+            <span className="grid place-items-center h-10 w-10 rounded-2xl bg-primary/12 text-primary shrink-0">
+              <Sprout className="h-5 w-5" />
             </span>
-          </div>
-        </GlassCard>
-      </Link>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-muted-foreground">{t('crop_status')}</p>
+              <p className="text-sm font-bold truncate">{isHindi ? 'फार्म और फसलें जोड़ें' : 'Add farms and crops to get started'}</p>
+            </div>
+            <ChevronRight className="h-4 w-4 text-muted-foreground" />
+          </GlassCard>
+        </Link>
+      )}
 
       {/* Market tip */}
       <Link to="/market">
