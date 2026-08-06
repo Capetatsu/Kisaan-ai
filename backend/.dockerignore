@@ -1,0 +1,27 @@
+# Dependencies
+venv
+.pytest_cache
+__pycache__
+*.py[cod]
+
+# Environment files (never copy secrets into Docker)
+.env
+.env.*
+
+# Tests (not needed in production image)
+tests
+
+# Git
+.git
+.gitignore
+
+# Editor
+.vscode
+.idea
+*.sw?
+
+# Logs
+*.log
+
+# OS
+.DS_Store

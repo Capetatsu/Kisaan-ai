@@ -226,7 +226,48 @@ npm run typecheck  # tsc -p ./jsconfig.json
 
 ---
 
-## 9. Future Tasks / Backlog
+## 9. Docker & Deployment
+
+### Docker Setup (added)
+
+The project now has full Docker support so anyone can run it with a single command:
+
+| File | Purpose |
+|------|---------|
+| `Dockerfile` | Frontend multi-stage build (Node 20 → Nginx) |
+| `backend/Dockerfile` | Backend Python 3.12 image with auto-migrations |
+| `nginx.conf` | Nginx config: SPA routing + `/api` proxy to backend |
+| `docker-compose.yml` | Orchestrates frontend, backend, and PostgreSQL 16 |
+| `.dockerignore` | Root build context exclusions |
+| `backend/.dockerignore` | Backend build context exclusions |
+| `.env.example` | Frontend env template |
+| `backend/.env.example` | Backend env template |
+| `DEPLOYMENT.md` | Full Docker + deployment guide |
+
+### Run with Docker
+
+```bash
+cp backend/.env.example backend/.env
+cp .env.example .env
+# Edit backend/.env with your secrets
+docker-compose up --build
+```
+
+- Frontend: `http://localhost`
+- Backend: `http://localhost:8000`
+- Health: `http://localhost:8000/health`
+
+### Backend Deployment
+
+See `DEPLOYMENT.md` for detailed instructions. Options include:
+- **Render** (recommended, free tier) — set root dir to `backend`, build: `pip install -r requirements.txt`, start: `alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- **Railway** — root dir `backend`, auto-deploy on push
+- **VPS** — `docker-compose up -d --build`
+- **Manual** — venv + uvicorn
+
+---
+
+## 10. Future Tasks / Backlog
 
 - Notifications endpoint + UI
 - Verified advisories endpoint
@@ -237,4 +278,4 @@ npm run typecheck  # tsc -p ./jsconfig.json
 - ForgotPassword / ResetPassword pages (routes already defined in `App.jsx`, placeholder pages exist)
 - Photo upload / leaf-disease detection via AI
 - Expand language coverage to all UI strings
-- Production deploy config (frontend build + backend hosting)
+- CI/CD pipeline (GitHub Actions for automated tests + deploy)
