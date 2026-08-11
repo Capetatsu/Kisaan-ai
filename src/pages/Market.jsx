@@ -6,7 +6,7 @@ import KisaanMascot from '@/components/mascot/KisaanMascot';
 import { TrendingUp, TrendingDown, Minus, MapPin, Clock, ArrowRight } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { api } from '@/lib/api';
-import { animateStaggerEntrance, prefersReducedMotion } from '@/lib/animation';
+import { animateCount, animateStaggerEntrance, prefersReducedMotion } from '@/lib/animation';
 
 const trendIcon = { up: TrendingUp, down: TrendingDown, flat: Minus };
 const trendColor = { up: 'text-primary', down: 'text-berry', flat: 'text-muted-foreground' };
@@ -21,6 +21,37 @@ const suggText = { sell: 'text-primary', hold: 'text-sun', buy: 'text-accent' };
 const normalizeTrend = (t) => (['up', 'down', 'flat'].includes(t) ? t : 'flat');
 const normalizeSuggestion = (s) => (['sell', 'hold', 'buy'].includes(s) ? s : 'hold');
 
+function PriceCounter({ value }) {
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      setDisplay(value);
+      return;
+    }
+    animateCount(null, 0, value, { duration: 900, onUpdate: setDisplay });
+  }, [value]);
+
+  return <>₹{display}</>;
+}
+
+function TrendArrow({ trend }) {
+  const Icon = trendIcon[trend];
+  const [bounce, setBounce] = useState(false);
+
+  useEffect(() => {
+    setBounce(false);
+    const t = setTimeout(() => setBounce(true), 50);
+    return () => clearTimeout(t);
+  }, [trend]);
+
+  return (
+    <span className={`inline-flex items-center gap-1 ${bounce ? 'animate-trend-bounce' : ''}`}>
+      <Icon className="h-4 w-4" strokeWidth={2.8} />
+    </span>
+  );
+}
+
 export default function Market() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
@@ -28,12 +59,12 @@ export default function Market() {
   const [nearbyMandi, setNearbyMandi] = useState({ name: 'Sanwer Mandi', distance: '8 km', open: true });
   const [activeId, setActiveId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const cardsRef = useRef(null);
+  const cropListRef = useRef(null);
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    animateStaggerEntrance(cardsRef.current?.children, { delay: 80 });
-  }, []);
+    if (cropListRef.current) animateStaggerEntrance(cropListRef.current.children, { delay: 50, start: 200 });
+  }, [marketData]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -76,7 +107,7 @@ export default function Market() {
     return (
       <div className="space-y-4">
         <PageHeader title={t('nav_market')} subtitle={nearbyMandi.name} />
-        <GlassCard className="p-6 text-center">
+        <GlassCard className="p-6 text-center animate-scale-in">
           <KisaanMascot mood="confused" className="w-24 h-24 mx-auto mb-2" />
           <p className="text-sm font-extrabold text-muted-foreground">{isHindi ? 'कोई मंडी डेटा उपलब्ध नहीं' : 'No market data available'}</p>
         </GlassCard>
@@ -84,22 +115,22 @@ export default function Market() {
     );
   }
 
-  const TrendIcon = trendIcon[active.trend];
-
   return (
-    <div ref={cardsRef} className="space-y-4">
+    <div className="space-y-4">
       <PageHeader title={t('nav_market')} subtitle={nearbyMandi.name} />
 
       {/* Hero — big blue price section */}
-      <div className="rounded-3xl overflow-hidden animate-fade-up stagger-1 border-4 text-white relative"
+      <div className="rounded-3xl overflow-hidden border-4 text-white relative animate-fade-up"
         style={{ backgroundColor: 'hsl(var(--hero-water))', borderColor: 'hsl(var(--water-edge))' }}>
         <div className="px-5 pt-5 pb-4">
           <div className="flex items-start justify-between">
             <div>
               <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">{t('current_price')}</p>
               <p className="text-2xl font-extrabold mt-1">{isHindi ? active.cropHi : active.crop} {active.emoji}</p>
-              <div className="flex items-center gap-1 mt-1">
-                <span className="text-5xl font-extrabold font-heading leading-none drop-shadow-sm">₹{active.price}</span>
+              <div className="flex items-baseline gap-1 mt-1">
+                <span className="text-5xl font-extrabold font-heading leading-none drop-shadow-sm">
+                  <PriceCounter value={active.price} />
+                </span>
                 <span className="text-sm font-bold text-white/80 mt-auto mb-0.5">/{active.unit}</span>
               </div>
             </div>
@@ -109,12 +140,12 @@ export default function Market() {
           </div>
           <div className="flex items-center gap-2 mt-4">
             <span className={`inline-flex items-center gap-1 rounded-full px-3.5 py-1.5 text-sm font-extrabold border-2 border-white/40 bg-white/20 ${trendColor[active.trend]}`}>
-              <TrendIcon className="h-4 w-4" strokeWidth={2.8} />
+              <TrendArrow trend={active.trend} />
               {active.change}% {isHindi ? 'आज' : 'today'}
             </span>
             <span className={`inline-flex items-center rounded-full border-2 border-white/40 bg-white px-3 py-1 text-sm font-extrabold ${suggText[active.suggestion]}`}>
-  {t(active.suggestion).toUpperCase()}
-</span>
+              {t(active.suggestion).toUpperCase()}
+            </span>
           </div>
         </div>
       </div>
@@ -154,9 +185,9 @@ export default function Market() {
         </GlassCard>
       </div>
 
-      {/* All crops list */}
+      {/* All crops list — scroll-reveal stagger */}
       <p className="text-xs font-extrabold text-muted-foreground px-1">{isHindi ? 'सभी फसलें' : 'All crops'}</p>
-      <div className="space-y-2.5">
+      <div className="space-y-2.5" ref={cropListRef}>
         {marketData.map((m) => {
           const TI = trendIcon[m.trend];
           return (

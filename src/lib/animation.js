@@ -99,8 +99,8 @@ export function animateProgress(target, value, options = {}) {
 
 export function animateCount(target, from, to, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  const { onUpdate, ...rest } = options;
   const obj = { value: from };
-  const onUpdate = options.onUpdate;
   return anime(obj, {
     value: to,
     duration: 800,
@@ -109,7 +109,7 @@ export function animateCount(target, from, to, options = {}) {
     onRender: () => {
       if (onUpdate) onUpdate(Math.round(obj.value));
     },
-    ...options,
+    ...rest,
   });
 }
 
@@ -273,4 +273,57 @@ export function useReducedMotion() {
     return () => media.removeEventListener('change', handler);
   }, []);
   return reduce;
+}
+
+/**
+ * Stagger-reveals children of a container when it scrolls into view.
+ * Returns a ref to attach to the container element.
+ * Usage: const staggerRef = useStaggerReveal({ delay: 60 });
+ *        <div ref={staggerRef}> ...children with opacity:0... </div>
+ */
+export function useStaggerReveal(options = {}) {
+  const { threshold = 0.15, rootMargin = '0px 0px -40px 0px', staggerDelay = 60, startDelay = 80 } = options;
+  const containerRef = useRef(null);
+  const animatedRef = useRef(false);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el || animatedRef.current) return;
+    if (prefersReducedMotion()) {
+      for (const child of el.children) {
+        child.style.opacity = '1';
+        child.style.transform = 'none';
+      }
+      return;
+    }
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !animatedRef.current) {
+          animatedRef.current = true;
+          animateStaggerEntrance(el.children, {
+            delay: staggerDelay,
+            start: startDelay,
+          });
+          observer.unobserve(el);
+        }
+      });
+    }, { threshold, rootMargin });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [threshold, rootMargin, staggerDelay, startDelay]);
+
+  const callbackRef = useCallback((el) => {
+    if (el) {
+      if (!animatedRef.current) {
+        const reduced = prefersReducedMotion();
+        for (const child of el.children) {
+          child.style.opacity = reduced ? '1' : '0';
+          child.style.transform = reduced ? 'none' : 'translateY(12px)';
+        }
+      }
+      containerRef.current = el;
+    }
+  }, []);
+
+  return callbackRef;
 }

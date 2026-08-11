@@ -32,15 +32,8 @@ export default function Home() {
   const schemesRef = useRef(null);
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
-      if (schemesRef.current) {
-        for (const child of schemesRef.current.children) {
-          child.style.opacity = '1';
-        }
-      }
-      return;
-    }
-    animateStaggerEntrance(schemesRef.current?.children, { delay: 80 });
+    if (prefersReducedMotion()) return;
+    if (schemesRef.current) animateStaggerEntrance(schemesRef.current.children, { delay: 80 });
   }, []);
 
   useEffect(() => {
@@ -84,7 +77,6 @@ export default function Home() {
             tone: 'wait',
           });
         } catch {
-          // AI fallback - use mock
           setAiRec(null);
         }
       } catch (e) {
@@ -118,7 +110,7 @@ export default function Home() {
         </div>
 
         {/* Weather hero — big colorful section */}
-        <div className="rounded-3xl overflow-hidden animate-fade-up stagger-2 border-4 text-white relative"
+        <div className="rounded-3xl overflow-hidden border-4 text-white relative animate-fade-up stagger-2"
           style={{ backgroundColor: 'hsl(var(--hero-water))', borderColor: 'hsl(var(--water-edge))' }}>
           <div className="relative px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
@@ -215,10 +207,10 @@ export default function Home() {
           </div>
         </Link>
 
-        {/* Scheme reminders */}
+        {/* Scheme reminders — scroll-reveal stagger */}
         <div className="space-y-3" ref={schemesRef}>
           {schemes.map((s) => (
-            <div key={s.id} className="glass rounded-2xl p-4 flex items-center gap-3" style={{ opacity: 0 }}>
+            <div key={s.id} className="glass rounded-2xl p-4 flex items-center gap-3">
               <span className={`grid place-items-center h-11 w-11 rounded-xl shrink-0 ${s.tone === 'warning' ? 'bg-tangerine/15 text-tangerine' : 'bg-primary/12 text-primary'}`}>
                 <Landmark className="h-5 w-5" strokeWidth={2.5} />
               </span>

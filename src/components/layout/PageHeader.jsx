@@ -19,7 +19,7 @@ export default function PageHeader({ title, subtitle }) {
           className="shrink-0 active:scale-90 transition-transform relative tap-target"
           aria-label={t('profile')}
         >
-          <span className="absolute -top-0.5 -right-0.5 z-10 grid place-items-center h-4 w-4 rounded-full bg-primary text-white text-[9px] font-extrabold">3</span>
+          <span className="absolute -top-0.5 -right-0.5 z-10 grid place-items-center h-4 w-4 rounded-full bg-primary text-white text-[9px] font-extrabold animate-bell-wiggle">3</span>
           <span className="h-12 w-12 rounded-full border-[3px] border-card shadow-duo bg-primary/15 grid place-items-center text-primary">
             <User className="h-6 w-6" strokeWidth={2} />
           </span>
@@ -51,7 +51,7 @@ export default function PageHeader({ title, subtitle }) {
           <button
             onClick={openMenu}
             className="grid place-items-center h-11 w-11 rounded-xl bg-primary text-white border-2 border-primary-edge active:translate-y-[2px] active:shadow-none transition-all tap-target"
-            style={{ boxShadow: '0 2px 8px -2px rgba(0,0,0,0.15), 0 1px 2px -1px rgba(0,0,0,0.1)' }}
+            style={{ boxShadow: '0 3px 0 #1A5C0A, 0 4px 12px -2px rgba(0,0,0,0.2)' }}
             aria-label={t('nav_menu')}
           >
             <Menu className="h-5 w-5" strokeWidth={2.6} />

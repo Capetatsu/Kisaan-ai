@@ -64,7 +64,6 @@ function NotificationCard({ n, isHindi, index }) {
 export default function Notifications() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
-  const [filter, setFilter] = useState('all');
   const [displayFilter, setDisplayFilter] = useState('all');
   const [transitioning, setTransitioning] = useState(false);
   const listRef = useRef(null);
@@ -82,7 +81,6 @@ export default function Notifications() {
     if (prefersReducedMotion() || cards.length === 0) {
       setDisplayFilter(newFilter);
       prevFilterRef.current = newFilter;
-      setFilter(newFilter);
       setTransitioning(false);
       return;
     }
@@ -93,7 +91,6 @@ export default function Notifications() {
 
     Promise.all(promises).then(() => {
       setDisplayFilter(newFilter);
-      setFilter(newFilter);
       prevFilterRef.current = newFilter;
       setTransitioning(false);
     });
@@ -107,9 +104,10 @@ export default function Notifications() {
           className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap transition-all tap-target ${displayFilter === 'all' ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}>
           {isHindi ? 'सभी' : 'All'}
         </button>
-        {cats.map((c) => (
+        {cats.map((c, i) => (
           <button key={c} onClick={() => handleFilterChange(c)}
-            className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap capitalize transition-all tap-target ${displayFilter === c ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}>
+            className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap capitalize transition-all tap-target animate-chip-slide ${displayFilter === c ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}
+            style={{ animationDelay: `${i * 0.04}s` }}>
             {t(c)}
           </button>
         ))}
@@ -120,7 +118,7 @@ export default function Notifications() {
         ))}
       </div>
       {list.length === 0 && (
-        <div className="glass p-8 text-center animate-fade-up">
+        <div className="glass p-8 text-center animate-scale-in">
           <KisaanMascot mood="happy" className="w-24 h-24 mx-auto mb-2" />
           <p className="text-sm font-extrabold text-muted-foreground">{isHindi ? 'कोई सूचनाएँ नहीं' : 'No notifications'}</p>
         </div>

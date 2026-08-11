@@ -9,7 +9,7 @@ import { Sprout, Droplets, Bug, Camera, Droplet, Cloud, Scissors, Leaf, Plus, Ch
 import { useLang } from '@/lib/languageContext';
 import { api } from '@/lib/api';
 import { Link, useNavigate } from 'react-router-dom';
-import { animateStaggerEntrance, prefersReducedMotion } from '@/lib/animation';
+import { animateCount, animateStaggerEntrance, prefersReducedMotion } from '@/lib/animation';
 
 const diseaseTone = { low: 'green', medium: 'amber', high: 'red' };
 
@@ -32,6 +32,20 @@ const cropEmojisHi = {
   आलू: '🥔', मिर्च: '🌶️', सरसों: '🌼', मूंगफली: '🥜',
 };
 
+function HealthCounter({ value }) {
+  const [display, setDisplay] = useState(0);
+
+  useEffect(() => {
+    if (prefersReducedMotion()) {
+      setDisplay(value);
+      return;
+    }
+    animateCount(null, 0, value, { duration: 800, onUpdate: setDisplay });
+  }, [value]);
+
+  return <span className="text-4xl font-extrabold font-heading drop-shadow-sm">{display}%</span>;
+}
+
 export default function Crops() {
   const { t, lang } = useLang();
   const navigate = useNavigate();
@@ -41,11 +55,13 @@ export default function Crops() {
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState(false);
   const cardsRef = useRef(null);
+  const actionsRef = useRef(null);
 
   useEffect(() => {
     if (prefersReducedMotion()) return;
-    animateStaggerEntrance(cardsRef.current?.children, { delay: 80 });
-  }, []);
+    if (cardsRef.current) animateStaggerEntrance(cardsRef.current.children, { delay: 70, start: 100 });
+    if (actionsRef.current) animateStaggerEntrance(actionsRef.current.children, { delay: 60, start: 150 });
+  }, [crops, activeId]);
 
   useEffect(() => {
     const loadCrops = async () => {
@@ -100,7 +116,7 @@ export default function Crops() {
     return (
       <div className="space-y-4">
         <PageHeader title={t('my_crops')} subtitle={isHindi ? 'लॉगिन आवश्यक' : 'login required'} />
-        <GlassCard className="p-6 text-center">
+        <GlassCard className="p-6 text-center animate-scale-in">
           <KisaanMascot mood="confused" className="w-24 h-24 mx-auto mb-2" />
           <p className="text-base font-extrabold">{isHindi ? 'लॉगिन करें' : 'Please login'}</p>
           <p className="text-xs text-muted-foreground mt-1 font-semibold">{isHindi ? 'अपनी फसलें देखने के लिए लॉगिन करें' : 'Login to view your crops and farms'}</p>
@@ -113,7 +129,7 @@ export default function Crops() {
     return (
       <div className="space-y-4">
         <PageHeader title={t('my_crops')} subtitle={isHindi ? 'कोई फसल नहीं' : 'no crops'} />
-        <GlassCard className="p-6 text-center">
+        <GlassCard className="p-6 text-center animate-scale-in">
           <KisaanMascot mood="growing" className="w-28 h-28 mx-auto mb-2 animate-float-soft" />
           <p className="text-base font-extrabold">{isHindi ? 'अभी कोई फसल नहीं' : 'No crops yet'}</p>
           <p className="text-xs text-muted-foreground mt-1 font-semibold">{isHindi ? 'पहले एक फार्म बनाएं और फसल जोड़ें' : 'Create a farm first, then add crops'}</p>
@@ -127,15 +143,16 @@ export default function Crops() {
   }
 
   return (
-    <div ref={cardsRef} className="space-y-4">
+    <div className="space-y-4">
       <PageHeader title={t('my_crops')} subtitle={`${crops.length} ${isHindi ? 'फसलें सक्रिय' : 'crops active'}`} />
 
       {/* Crop selector chips */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
         {crops.map((c) => (
           <button key={c.id} onClick={() => setActiveId(c.id)}
-            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-extrabold whitespace-nowrap transition-all tap-target
-              ${c.id === activeId ? 'bg-primary text-white border-2 border-primary-edge shadow-duo' : 'glass text-foreground'}`}>
+            className={`shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-extrabold whitespace-nowrap transition-all tap-target animate-chip-slide
+              ${c.id === activeId ? 'bg-primary text-white border-2 border-primary-edge shadow-duo' : 'glass text-foreground'}`}
+            style={{ animationDelay: `${crops.indexOf(c) * 0.05}s` }}>
             <span className="text-lg">{c.emoji}</span>
             {c.name}
           </button>
@@ -143,7 +160,7 @@ export default function Crops() {
       </div>
 
       {/* Crop hero — big green section */}
-      <div className="rounded-3xl overflow-hidden animate-fade-up stagger-1 border-4 text-white relative"
+      <div className="rounded-3xl overflow-hidden border-4 text-white relative animate-fade-up"
         style={{ backgroundColor: 'hsl(var(--hero-primary))', borderColor: 'hsl(var(--primary-edge))' }}>
         <CropBackground cropName={active.name} />
         <div className="px-5 pt-5 pb-4 relative z-10">
@@ -157,26 +174,26 @@ export default function Crops() {
               <KisaanMascot mood={active.health >= 80 ? 'happy' : active.health >= 60 ? 'watering' : 'warning'} className="w-full h-full drop-shadow" />
             </div>
           </div>
-<div className="flex items-center gap-2 mt-4">
-              <span className="text-4xl font-extrabold font-heading drop-shadow-sm">{active.health}%</span>
-              <AnimatedProgressBar value={active.health} color="sun" className="flex-1" style={{ background: 'rgba(255,255,255,0.25)' }} />
-            </div>
+          <div className="flex items-center gap-2 mt-4">
+            <HealthCounter value={active.health} />
+            <AnimatedProgressBar value={active.health} color="sun" className="flex-1" style={{ background: 'rgba(255,255,255,0.25)' }} />
+          </div>
         </div>
       </div>
 
-      {/* Status grid */}
-      <div className="grid grid-cols-3 gap-3">
-        <GlassCard className="p-4 text-center animate-fade-up stagger-1 border-[3px] border-primary/25">
+      {/* Status grid — stagger reveal */}
+      <div className="grid grid-cols-3 gap-3" ref={cardsRef}>
+        <GlassCard className="p-4 text-center border-[3px] border-primary/25">
           <span className="mx-auto mb-1.5 grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary"><Sprout className="h-5 w-5" strokeWidth={2.5} /></span>
           <p className="text-[10px] text-muted-foreground font-bold">{t('crop_health')}</p>
           <p className="text-xl font-extrabold">{active.health}%</p>
         </GlassCard>
-        <GlassCard className="p-4 text-center animate-fade-up stagger-2 border-[3px] border-water/25">
+        <GlassCard className="p-4 text-center border-[3px] border-water/25">
           <span className="mx-auto mb-1.5 grid place-items-center h-9 w-9 rounded-xl bg-water/12 text-water"><Droplets className="h-5 w-5" strokeWidth={2.5} /></span>
           <p className="text-[10px] text-muted-foreground font-bold">{t('water_need')}</p>
           <p className="text-xl font-extrabold capitalize">{t(active.water)}</p>
         </GlassCard>
-        <GlassCard className="p-4 text-center animate-fade-up stagger-3 border-[3px] border-berry/25">
+        <GlassCard className="p-4 text-center border-[3px] border-berry/25">
           <span className="mx-auto mb-1.5 grid place-items-center h-9 w-9 rounded-xl bg-berry/12 text-berry"><Bug className="h-5 w-5" strokeWidth={2.5} /></span>
           <p className="text-[10px] text-muted-foreground font-bold">{t('disease_risk')}</p>
           <p className="text-xl font-extrabold capitalize">{t(active.disease)}</p>
@@ -184,7 +201,7 @@ export default function Crops() {
       </div>
 
       {/* Next action */}
-      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up stagger-4 glow border-[3px] border-primary/20">
+      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up glow border-[3px] border-primary/20">
         <span className="grid place-items-center h-12 w-12 rounded-xl bg-primary text-white shrink-0 shadow-duo">
           <ChevronRight className="h-6 w-6" strokeWidth={2.8} />
         </span>
@@ -195,12 +212,12 @@ export default function Crops() {
         <StatusChip tone={diseaseTone[active.disease]} pulse>{t(active.disease)} {isHindi ? 'जोखिम' : 'risk'}</StatusChip>
       </GlassCard>
 
-      {/* Quick actions */}
+      {/* Quick actions — stagger reveal */}
       <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-wide px-1">{t('today_action')}</p>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3" ref={actionsRef}>
         {quickActions.map(({ key, Icon, cls, nav }) => (
           <button key={key} onClick={nav ? () => navigate(nav) : undefined}>
-            <GlassCard className="p-4 flex items-center gap-3 animate-fade-up stagger-5 active:scale-[0.97] transition-transform border-2">
+            <GlassCard className="p-4 flex items-center gap-3 active:scale-[0.97] transition-transform border-2">
               <span className={`grid place-items-center h-10 w-10 rounded-xl ${cls} shrink-0`}>
                 <Icon className="h-5 w-5" strokeWidth={2.5} />
               </span>

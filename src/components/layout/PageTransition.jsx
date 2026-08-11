@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
-import { animateSlideFadeIn, animateSlideFadeOut, prefersReducedMotion } from '@/lib/animation';
+import { prefersReducedMotion } from '@/lib/animation';
 
 export default function PageTransition({ outletContext }) {
   const location = useLocation();
-  const outletRef = useRef(null);
-  const [key, setKey] = useState(0);
+  const [displayLocation, setDisplayLocation] = useState(location);
+  const [stage, setStage] = useState('enter');
   const isMountedRef = useRef(true);
 
   useEffect(() => {
@@ -14,28 +14,42 @@ export default function PageTransition({ outletContext }) {
   }, []);
 
   useEffect(() => {
+    if (location.pathname === displayLocation.pathname) {
+      setDisplayLocation(location);
+      return;
+    }
     if (prefersReducedMotion()) {
-      setKey(k => k + 1);
+      setDisplayLocation(location);
       return;
     }
-    const outlet = outletRef.current;
-    if (!outlet) {
-      setKey(k => k + 1);
-      return;
-    }
-    animateSlideFadeOut(outlet, 'up').then(() => {
-      if (!isMountedRef.current) return;
-      setKey(k => k + 1);
-      requestAnimationFrame(() => {
-        if (!isMountedRef.current) return;
-        animateSlideFadeIn(outlet, 'up');
-      });
-    });
+    setStage('exit');
   }, [location.pathname]);
 
+  const handleAnimEnd = useCallback(() => {
+    if (stage === 'exit') {
+      setDisplayLocation(location);
+      setStage('enter');
+    }
+  }, [stage, location]);
+
+  if (prefersReducedMotion()) {
+    return (
+      <div className="min-h-[1px]">
+        <Outlet key={location.pathname} context={outletContext} />
+      </div>
+    );
+  }
+
   return (
-    <div ref={outletRef} style={{ position: 'relative', minHeight: '1px' }}>
-      <Outlet key={key} context={outletContext} />
+    <div
+      className={`min-h-[1px] transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+        stage === 'exit'
+          ? 'opacity-0 translate-y-2 scale-[0.99]'
+          : 'opacity-100 translate-y-0 scale-100'
+      }`}
+      onTransitionEnd={handleAnimEnd}
+    >
+      <Outlet key={displayLocation.pathname} context={outletContext} />
     </div>
   );
 }

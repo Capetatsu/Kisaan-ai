@@ -1,11 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import PageHeader from '@/components/layout/PageHeader';
-import { FileText, Download, CheckCircle2 } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { reports } from '@/lib/mockData';
 import { animateSuccessBurst, prefersReducedMotion } from '@/lib/animation';
-import { useRef } from 'react';
+
+function CheckmarkSVG({ className }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="20 6 9 17 4 12" className="animate-checkmark-draw" />
+    </svg>
+  );
+}
 
 export default function Reports() {
   const { t, lang } = useLang();
@@ -20,7 +27,7 @@ export default function Reports() {
     }
     setTimeout(() => {
       setDownloaded((prev) => ({ ...prev, [r.id]: false }));
-    }, 2000);
+    }, 2500);
   };
 
   return (
@@ -38,9 +45,9 @@ export default function Reports() {
           {downloaded[r.id] ? (
             <span
               ref={(el) => { checkRefs.current[r.id] = el; }}
-              className="grid place-items-center h-9 w-9 rounded-lg bg-primary/12 text-primary shrink-0 animate-success-flash"
+              className="grid place-items-center h-9 w-9 rounded-lg bg-primary/12 text-primary shrink-0"
             >
-              <CheckCircle2 className="h-4 w-4" />
+              <CheckmarkSVG className="h-5 w-5" />
             </span>
           ) : (
             <button

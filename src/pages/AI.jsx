@@ -12,27 +12,46 @@ import { api } from '@/lib/api';
 
 function AiBubble({ msg, isHindi }) {
   return (
-    <GlassCard strong className="p-4 animate-fade-up ml-9">
+    <GlassCard strong className="p-4 ml-9 animate-slide-up">
       <div className="flex items-center gap-2 mb-2">
         <span className="grid place-items-center h-6 w-6 rounded-lg bg-primary/15 text-primary"><Sparkles className="h-3.5 w-3.5" /></span>
         <span className="text-[10px] font-bold text-muted-foreground">AI</span>
         <StatusChip tone="green" className="ml-auto">{msg.confidence}%</StatusChip>
       </div>
       <div className="space-y-2 text-sm">
-        <div><span className="text-[10px] font-bold text-muted-foreground uppercase">{isHindi ? 'समस्या' : 'Problem'}</span><p className="font-semibold">{msg.problem}</p></div>
-        <div><span className="text-[10px] font-bold text-muted-foreground uppercase">{isHindi ? 'कारण' : 'Reason'}</span><p className="text-muted-foreground">{msg.reason}</p></div>
-        <div className="flex items-start gap-2 rounded-2xl bg-primary/10 p-3">
+        <div className="animate-fade-up" style={{ animationDelay: '0.1s' }}>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase">{isHindi ? 'समस्या' : 'Problem'}</span>
+          <p className="font-semibold">{msg.problem}</p>
+        </div>
+        <div className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          <span className="text-[10px] font-bold text-muted-foreground uppercase">{isHindi ? 'कारण' : 'Reason'}</span>
+          <p className="text-muted-foreground">{msg.reason}</p>
+        </div>
+        <div className="flex items-start gap-2 rounded-2xl bg-primary/10 p-3 animate-fade-up" style={{ animationDelay: '0.3s' }}>
           <ArrowRight className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <div><span className="text-[10px] font-bold text-primary uppercase">{isHindi ? 'कदम' : 'Action'}</span><p className="font-semibold text-primary">{msg.action}</p></div>
         </div>
         {msg.scheme && (
-          <div className="flex items-center gap-2 rounded-2xl bg-warning/10 p-3">
+          <div className="flex items-center gap-2 rounded-2xl bg-warning/10 p-3 animate-fade-up" style={{ animationDelay: '0.4s' }}>
             <Landmark className="h-4 w-4 text-warning shrink-0" />
             <p className="text-xs text-warning font-medium">{msg.scheme}</p>
           </div>
         )}
       </div>
     </GlassCard>
+  );
+}
+
+function TypingIndicator() {
+  return (
+    <div className="flex items-center gap-2 ml-9 animate-slide-up">
+      <span className="flex gap-1 items-center bg-primary/10 rounded-full px-3 py-2">
+        <span className="h-2 w-2 rounded-full bg-primary typing-dot" />
+        <span className="h-2 w-2 rounded-full bg-primary typing-dot" />
+        <span className="h-2 w-2 rounded-full bg-primary typing-dot" />
+      </span>
+      <span className="text-xs text-muted-foreground font-semibold">AI is thinking...</span>
+    </div>
   );
 }
 
@@ -45,7 +64,13 @@ export default function AI() {
   const [listening, setListening] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendBounce, setSendBounce] = useState(false);
+  const [showHero, setShowHero] = useState(false);
   const endRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowHero(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [thread]);
 
@@ -61,7 +86,7 @@ export default function AI() {
         language: lang,
       });
       setThread((prev) => [...prev, { role: 'ai', ...response }]);
-    } catch (e) {
+    } catch {
       setThread((prev) => [
         ...prev,
         {
@@ -79,7 +104,7 @@ export default function AI() {
   };
 
   const typingBar = (
-    <div className="glass-strong rounded-[1.5rem] p-2 flex items-center gap-2 shadow-2xl overflow-hidden transition-all duration-300 ease-in-out">
+    <div className="glass-strong rounded-[1.5rem] p-2 flex items-center gap-2 shadow-2xl overflow-hidden animate-slide-up" style={{ animationDelay: '0.3s' }}>
       <button onClick={() => setListening((l) => !l)}
         className={`grid place-items-center h-10 w-10 rounded-xl shrink-0 transition-all tap-target ${listening ? 'bg-destructive text-destructive-foreground voice-glow' : 'bg-primary/12 text-primary'}`}>
         <Mic className="h-5 w-5" />
@@ -94,8 +119,8 @@ export default function AI() {
         placeholder={t('ask_anything')}
         className="flex-1 bg-transparent outline-none text-sm px-1 min-w-0"
       />
-      <button onClick={() => send(input)} disabled={!input.trim() || sending}
-        className="grid place-items-center h-10 w-10 rounded-full bg-primary text-primary-foreground shrink-0 border-2 border-primary-edge disabled:opacity-40 active:translate-y-[2px] active:shadow-none transition-transform tap-target"
+      <button onClick={() => { send(input); setSendBounce(true); setTimeout(() => setSendBounce(false), 300); }} disabled={!input.trim() || sending}
+        className={`grid place-items-center h-10 w-10 rounded-full bg-primary text-primary-foreground shrink-0 border-2 border-primary-edge disabled:opacity-40 active:translate-y-[2px] active:shadow-none transition-transform tap-target ${sendBounce ? 'animate-nav-bounce' : ''}`}
         style={{ boxShadow: '0 3px 0 #1A5C0A, 0 4px 10px -2px rgba(0,0,0,0.2)' }}>
         <Send className="h-5 w-5" />
       </button>
@@ -114,7 +139,7 @@ export default function AI() {
       {/* Thread */}
       <div className="space-y-3">
         {thread.length === 0 && !sending && (
-          <div className="rounded-3xl overflow-hidden animate-fade-up bg-accent border-4 border-accent-edge text-white relative">
+          <div className={`rounded-3xl overflow-hidden bg-accent border-4 border-accent-edge text-white relative transition-all duration-500 ${showHero ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-95'}`}>
             <div className="px-5 pt-5 pb-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1 min-w-0">
@@ -135,33 +160,25 @@ export default function AI() {
         )}
         {thread.map((m, i) => (
           m.role === 'user' ? (
-            <div key={i} className="flex justify-end animate-fade-up">
+            <div key={i} className="flex justify-end animate-slide-up">
               <div className="max-w-[80%] rounded-2xl rounded-br-md bg-primary text-primary-foreground px-4 py-2.5 text-sm font-medium">
                 {m.text}
               </div>
             </div>
           ) : <AiBubble key={i} msg={m} isHindi={isHindi} />
         ))}
-        {sending && (
-          <div className="flex items-center gap-2 ml-9 animate-fade-up">
-            <span className="flex gap-1">
-              <span className="h-2 w-2 rounded-full bg-primary animate-bounce" />
-              <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.15s' }} />
-              <span className="h-2 w-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0.3s' }} />
-            </span>
-            <span className="text-xs text-muted-foreground">{t('listening')}</span>
-          </div>
-        )}
+        {sending && <TypingIndicator />}
         <div ref={endRef} />
       </div>
 
-      {/* Suggestion chips — kept in place */}
+      {/* Suggestion chips — stagger from right */}
       <div className={`fixed bottom-0 inset-x-0 z-30 px-4 pointer-events-none transition-all duration-300 ease-in-out ${aiNavOpen ? 'pb-24' : 'pb-3'}`}>
         <div className="mx-auto max-w-md space-y-2 pointer-events-auto">
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {quickSuggestions.map((q) => (
+            {quickSuggestions.map((q, i) => (
               <button key={q} onClick={() => send(q)}
-                className="shrink-0 whitespace-nowrap px-3.5 py-2 rounded-full glass text-xs font-semibold active:scale-95 transition-transform tap-target">
+                className="shrink-0 whitespace-nowrap px-3.5 py-2 rounded-full glass text-xs font-semibold active:scale-95 transition-transform tap-target animate-chip-slide"
+                style={{ animationDelay: `${0.5 + i * 0.08}s` }}>
                 {q}
               </button>
             ))}

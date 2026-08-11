@@ -310,6 +310,110 @@
     100% { transform: scale(1); }
   }
   .animate-nav-bounce { animation: nav-bounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+  /* Auth mascot zoom — fills screen then moves + shrinks to inline position */
+  @keyframes mascot-zoom {
+    0% {
+      transform: translate(0, 0) scale(15);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: translate(var(--final-x), var(--final-y)) scale(var(--final-scale));
+      opacity: 1;
+    }
+  }
+  .auth-mascot-zoom {
+    animation: mascot-zoom 2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* Checkmark SVG draw */
+  @keyframes checkmark-draw {
+    0% { stroke-dashoffset: 24; }
+    100% { stroke-dashoffset: 0; }
+  }
+  .animate-checkmark-draw {
+    stroke-dasharray: 24;
+    stroke-dashoffset: 24;
+    animation: checkmark-draw 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.15s forwards;
+  }
+
+  /* Confetti burst — particles fly out from center */
+  @keyframes confetti-pop {
+    0% { transform: translate(0, 0) scale(0); opacity: 1; }
+    50% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  .confetti-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    animation: confetti-pop 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* Typing dots — bounce in sequence */
+  @keyframes typing-bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-6px); }
+  }
+  .typing-dot { animation: typing-bounce 1.2s ease-in-out infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+  /* Bell wiggle */
+  @keyframes bell-wiggle {
+    0% { transform: rotate(0); }
+    15% { transform: rotate(14deg); }
+    30% { transform: rotate(-12deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(-6deg); }
+    75% { transform: rotate(3deg); }
+    100% { transform: rotate(0); }
+  }
+  .animate-bell-wiggle { animation: bell-wiggle 0.6s ease-in-out; }
+
+  /* Slide up entrance for typing bar / bottom sheets */
+  @keyframes slide-up-entrance {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-slide-up { animation: slide-up-entrance 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* Suggestion chip stagger from right */
+  @keyframes chip-slide {
+    from { opacity: 0; transform: translateX(20px) scale(0.9); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .animate-chip-slide { animation: chip-slide 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* Price count-up flash */
+  @keyframes price-flash {
+    0% { color: inherit; }
+    30% { color: hsl(var(--primary)); transform: scale(1.08); }
+    100% { color: inherit; transform: scale(1); }
+  }
+  .animate-price-flash { animation: price-flash 0.5s ease-out; }
+
+  /* Scale-in for modals/sheets */
+  @keyframes scale-in {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .animate-scale-in { animation: scale-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+  /* Trend arrow bounce */
+  @keyframes trend-bounce {
+    0% { transform: translateY(0); }
+    40% { transform: translateY(-3px); }
+    100% { transform: translateY(0); }
+  }
+  .animate-trend-bounce { animation: trend-bounce 0.4s ease-out; }
 }
 
 /* Respect reduced-motion preference for ALL CSS animations */
@@ -324,7 +428,15 @@
   .animate-wiggle,
   .animate-bar-grow,
   .animate-success-flash,
-  .animate-nav-bounce {
+  .animate-nav-bounce,
+  .animate-bell-wiggle,
+  .animate-slide-up,
+  .animate-chip-slide,
+  .animate-price-flash,
+  .animate-scale-in,
+  .animate-trend-bounce,
+  .animate-checkmark-draw,
+  .typing-dot {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
