@@ -22,7 +22,7 @@ export default function Settings() {
   const { t, lang, setLang } = useLang();
   const { theme, toggleTheme } = useTheme();
   const { seniorMode, setSeniorMode } = useSenior();
-  const { user, logout } = useAuth();
+  const { user, logout, navigateToLogin } = useAuth();
   const [notif, setNotif] = useState(true);
   const [voice, setVoice] = useState(true);
 
@@ -53,7 +53,7 @@ export default function Settings() {
           </div>
         </div>
         <button
-          onClick={logout}
+          onClick={() => { logout(); navigateToLogin(); }}
           className="w-full mt-4 flex items-center justify-center gap-2 py-3 rounded-2xl bg-berry/10 border-2 border-berry/30 text-berry font-extrabold text-sm active:scale-[0.98] transition-transform"
         >
           <LogOut className="h-4 w-4" />
