@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 export const languages = [
   { code: 'en', label: 'English', native: 'English' },
@@ -19,7 +19,7 @@ const translations = {
     scheme_reminder: 'Scheme reminder', continue_last: 'Continue last advice',
     emergency_alert: 'Emergency alert',
     spray: 'Spray', wait: 'Wait', sell: 'Sell', check: 'Check', ask: 'Ask', help: 'Help',
-    water: 'Water', harvest: 'Harvest', view_why: 'Why?', view: 'View', do_it: 'Do it',
+    water: 'Water', harvest: 'Harvest', view_why: 'Why?', view: 'View', do_it: 'Do it', done: 'Done',
     crop_health: 'Health', water_need: 'Water need', disease_risk: 'Disease risk',
     next_action: 'Next action', check_leaf: 'Check leaf', water_now: 'Water now',
     spray_tomorrow: 'Spray tomorrow', harvest_soon: 'Harvest soon', my_crops: 'My crops',
@@ -49,7 +49,7 @@ const translations = {
     scheme_reminder: 'योजना अनुस्मारक', continue_last: 'पिछली सलाह जारी रखें',
     emergency_alert: 'आपातकालीन सूचना',
     spray: 'छिड़काव', wait: 'रुकें', sell: 'बेचें', check: 'जांचें', ask: 'पूछें', help: 'सहायता',
-    water: 'सिंचाई', harvest: 'कटाई', view_why: 'क्यों?', view: 'देखें', do_it: 'करें',
+    water: 'सिंचाई', harvest: 'कटाई', view_why: 'क्यों?', view: 'देखें', do_it: 'करें', done: 'पूर्ण',
     crop_health: 'स्वास्थ्य', water_need: 'पानी', disease_risk: 'बीमारी जोखिम',
     next_action: 'अगला कदम', check_leaf: 'पत्ती जांचें', water_now: 'अभी पानी दें',
     spray_tomorrow: 'कल छिड़काव', harvest_soon: 'जल्द कटाई', my_crops: 'मेरी फसलें',
@@ -79,7 +79,7 @@ const translations = {
     scheme_reminder: 'योजना आठवण', continue_last: 'मागील सल्ला सुरू ठेवा',
     emergency_alert: 'आपत्कालीन सूचना',
     spray: 'फवारणी', wait: 'थांबा', sell: 'विका', check: 'तपासा', ask: 'विचारा', help: 'मदत',
-    water: 'पाणी', harvest: 'कापणी', view_why: 'का?', view: 'पहा', do_it: 'करा',
+    water: 'पाणी', harvest: 'कापणी', view_why: 'का?', view: 'पहा', do_it: 'करा', done: 'पूर्ण',
     crop_health: 'आरोग्य', water_need: 'पाणी गरज', disease_risk: 'रोग जोखीम',
     next_action: 'पुढील पाऊल', check_leaf: 'पान तपासा', water_now: 'आता पाणी द्या',
     spray_tomorrow: 'उद्या फवारणी', harvest_soon: 'लवकर कापणी', my_crops: 'माझी पिके',
@@ -109,7 +109,7 @@ const translations = {
     scheme_reminder: 'યોજના રીમાઇન્ડર', continue_last: 'છેલ્લી સલાહ ચાલુ રાખો',
     emergency_alert: 'કટોકટી સૂચના',
     spray: 'છંટાકાવ', wait: 'રોકાઓ', sell: 'વેચો', check: 'ચકાસો', ask: 'પૂછો', help: 'મદદ',
-    water: 'પાણી', harvest: 'લણણી', view_why: 'શા માટે?', view: 'જુઓ', do_it: 'કરો',
+    water: 'પાણી', harvest: 'લણણી', view_why: 'શા માટે?', view: 'જુઓ', do_it: 'કરો', done: 'પૂર્ણ',
     crop_health: 'સ્વાસ્થ્ય', water_need: 'પાણી જરૂર', disease_risk: 'રોગ જોખમ',
     next_action: 'આગળનું પગલું', check_leaf: 'પાન ચકાસો', water_now: 'હમણાં પાણી આપો',
     spray_tomorrow: 'કાલે છંટાકાવ', harvest_soon: 'જલ્દી લણણી', my_crops: 'મારા પાક',
@@ -139,7 +139,7 @@ const translations = {
     scheme_reminder: 'திட்ட நினைவூட்டல்', continue_last: 'கடைசி ஆலோசனையை தொடரவும்',
     emergency_alert: 'அவசர அறிவிப்பு',
     spray: 'தெளிக்கவும்', wait: 'பொறுக்கவும்', sell: 'விற்கவும்', check: 'சரிபார்க்கவும்', ask: 'கேளுங்கள்', help: 'உதவி',
-    water: 'நீர்', harvest: 'அறுவடை', view_why: 'ஏன்?', view: 'பார்க்கவும்', do_it: 'செய்யவும்',
+    water: 'நீர்', harvest: 'அறுவடை', view_why: 'ஏன்?', view: 'பார்க்கவும்', do_it: 'செய்யவும்', done: 'முடிந்தது',
     crop_health: 'ஆரோக்கியம்', water_need: 'நீர் தேவை', disease_risk: 'நோய் ஆபத்து',
     next_action: 'அடுத்த செயல்', check_leaf: 'இலை சரிபார்க்கவும்', water_now: 'இப்போது நீர் பாய்க்கவும்',
     spray_tomorrow: 'நாளை தெளிக்கவும்', harvest_soon: 'விரைவில் அறுவடை', my_crops: 'என் பயிர்கள்',
@@ -169,7 +169,7 @@ const translations = {
     scheme_reminder: 'పథకం రిమైండర్', continue_last: 'చివరి సలహా కొనసాగించండి',
     emergency_alert: 'అత్యవసర సూచన',
     spray: 'పిచికరించండి', wait: 'ఆగండి', sell: 'అమ్మండి', check: 'తనిఖీ చేయండి', ask: 'అడగండి', help: 'సహాయం',
-    water: 'నీరు', harvest: 'పంట కోత', view_why: 'ఎందుకు?', view: 'చూడండి', do_it: 'చేయండి',
+    water: 'నీరు', harvest: 'పంట కోత', view_why: 'ఎందుకు?', view: 'చూడండి', do_it: 'చేయండి', done: 'పూర్తయింది',
     crop_health: 'ఆరోగ్యం', water_need: 'నీరు అవసరం', disease_risk: 'వ్యాధి ప్రమాదం',
     next_action: 'తదుపరి చర్య', check_leaf: 'ఆకు తనిఖీ', water_now: 'ఇప్పుడే నీరు ఇవ్వండి',
     spray_tomorrow: 'రేపు పిచికరించండి', harvest_soon: 'త్వరలో పంట కోత', my_crops: 'నా పంటలు',
@@ -199,7 +199,7 @@ const translations = {
     scheme_reminder: 'প্রকল্প স্মারক', continue_last: 'শেষ পরামর্শ চালিয়ে যান',
     emergency_alert: 'জরুরি বিজ্ঞপ্তি',
     spray: 'স্প্রে করুন', wait: 'অপেক্ষা করুন', sell: 'বিক্রি করুন', check: 'যাচাই করুন', ask: 'জিজ্ঞাসা করুন', help: 'সাহায্য',
-    water: 'জল', harvest: 'ফসল কাটা', view_why: 'কেন?', view: 'দেখুন', do_it: 'করুন',
+    water: 'জল', harvest: 'ফসল কাটা', view_why: 'কেন?', view: 'দেখুন', do_it: 'করুন', done: 'সম্পন্ন',
     crop_health: 'স্বাস্থ্য', water_need: 'জল প্রয়োজন', disease_risk: 'রোগ ঝুঁকি',
     next_action: 'পরবর্তী পদক্ষেপ', check_leaf: 'পাতা যাচাই করুন', water_now: 'এখনই জল দিন',
     spray_tomorrow: 'আগামীকাল স্প্রে করুন', harvest_soon: 'শীঘ্রই ফসল কাটুন', my_crops: 'আমার ফসল',
@@ -226,7 +226,13 @@ const translations = {
 const LanguageContext = createContext();
 
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState('en');
+  const [lang, setLang] = useState(() => {
+    const stored = typeof window !== 'undefined' ? window.localStorage.getItem('kisaan_lang') : null;
+    return stored && translations[stored] ? stored : 'en';
+  });
+  useEffect(() => {
+    window.localStorage.setItem('kisaan_lang', lang);
+  }, [lang]);
   const t = useCallback((key) => translations[lang]?.[key] ?? translations.en[key] ?? key, [lang]);
   return (
     <LanguageContext.Provider value={{ lang, setLang, t, languages }}>

@@ -23,7 +23,7 @@ export default function Login() {
     setLoading(true);
     try {
       const result = await api.login({ email, password });
-      login(result.access_token);
+      await login(result.access_token);
       navigate("/");
     } catch (err) {
       setError(err.message || "Invalid email or password");
@@ -43,6 +43,11 @@ export default function Login() {
           <Link to="/register" className="text-primary font-medium hover:underline">
             Create one
           </Link>
+          <div className="mt-2">
+            <Link to="/forgot-password" className="text-muted-foreground hover:text-primary text-sm font-medium hover:underline">
+              Forgot password?
+            </Link>
+          </div>
         </>
       }
     >
@@ -88,7 +93,7 @@ export default function Login() {
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button type="submit" className="w-full" disabled={loading}>
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />

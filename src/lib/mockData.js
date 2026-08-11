@@ -82,9 +82,9 @@ export const aiThread = [
 ];
 
 export const verifiedAdvisories = [
-  { id: 1, src: 'Krishi Vigyan Kendra', title: 'Delayed sowing for soybean this week', titleHi: 'इस सप्ताह सोयाबीन देर से बुवाई', verified: true, time: '5h' },
-  { id: 2, src: 'ICAR', title: 'Use yellow sticky traps for whitefly', titleHi: 'व्हाइटफ्लाई के लिए पीला चिपकने वाला जाल', verified: true, time: '1d' },
-  { id: 3, src: 'State Agriculture Dept', title: 'Canal water release on 5 Aug', titleHi: '5 अगस्त को नहर जल रिहाई', verified: true, time: '2d' },
+  { id: 1, src: 'Krishi Vigyan Kendra', title: 'Delayed sowing for soybean this week', titleHi: 'इस सप्ताह सोयाबीन देर से बुवाई', body: 'Heavy rain forecast for Mon-Tue. Move soybean sowing to Wed or later for better germination.', bodyHi: 'सोम-मंगल के लिए भारी बारिश का अनुमान। सोयाबीन की बुवाई बेहतर अंकुरण के लिए बुधवार या बाद तक टालें।', verified: true, time: '5h' },
+  { id: 2, src: 'ICAR', title: 'Use yellow sticky traps for whitefly', titleHi: 'व्हाइटफ्लाई के लिए पीला चिपकने वाला जाल', body: 'Place 4 traps per acre at canopy height. Check and replace weekly.', bodyHi: 'प्रति एकड़ 4 जाल छत्र ऊंचाई पर लगाएं। साप्ताहिक जांचें और बदलें।', verified: true, time: '1d' },
+  { id: 3, src: 'State Agriculture Dept', title: 'Canal water release on 5 Aug', titleHi: '5 अगस्त को नहर जल रिहाई', body: 'Water will be released in the main canal on 5 Aug. Farmers can irrigate fields adjacent to the canal.', bodyHi: '5 अगस्त को मुख्य नहर में पानी छोड़ा जाएगा। नहर से सटे खेतों को सिंचाई की जा सकती है।', verified: true, time: '2d' },
 ];
 
 export const villageStats = {

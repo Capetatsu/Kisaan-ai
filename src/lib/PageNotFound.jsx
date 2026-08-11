@@ -2,6 +2,7 @@
 import { useLocation } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
+import { api } from '@/lib/api';
 
 export default function PageNotFound({}) {
     const location = useLocation();
@@ -11,7 +12,7 @@ export default function PageNotFound({}) {
         queryKey: ['user'],
         queryFn: async () => {
             try {
-                const user = await db.auth.me();
+                const user = await api.me();
                 return { user, isAuthenticated: true };
             } catch (error) {
                 return { user: null, isAuthenticated: false };

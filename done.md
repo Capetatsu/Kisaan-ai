@@ -121,6 +121,15 @@ Working tree has changes not yet committed. **Commit these after verifying:**
 - `src/App.jsx` — registered `/farms` and `/farms/:farmId` routes.
 - `src/lib/api.js` — added farm + crop API methods (already shown in section 5).
 
+### Latest work — Animation system (see §11)
+- `src/lib/animation.js` — animejs v4 wrapper (entry/stagger/press/progress/count/slide/burst), `useScrollReveal`, `useReducedMotion`.
+- `src/components/layout/PageTransition.jsx` — entrance/exit transitions per route (forwards `outletContext`).
+- `src/components/ui/AnimatedProgressBar.jsx` — count+width animated bar with scroll reveal.
+- `src/components/ui/GlassCard.jsx`, `BottomNav.jsx`, `MenuDrawer.jsx`, `LanguageSheet.jsx`, `PageHeader.jsx`, `KisaanMascot.jsx`, `button.jsx`, `StatusChip.jsx` — press/hover/entrance animations.
+- `src/pages/Home/Crops/Market/Notifications/AI` — staggered entrances, typing reveal.
+
+### Latest work — Bug-fix / hardening pass (see §12)
+
 > The frontend is currently on branch **`backend-foundation`** (up to date with `origin/backend-foundation`).
 
 ---
@@ -221,8 +230,8 @@ npm run typecheck  # tsc -p ./jsconfig.json
 ## 8. Current Git State
 
 - Branch: `backend-foundation` (tracking `origin/backend-foundation`).
-- **Uncommitted** (see §3 "Latest work"): Farms/FarmDetail/Crops UI, form dialogs, ConfirmDialog, form-field, Home + MenuDrawer + App + api.js changes.
-- These look complete and should be verified then committed as a feature commit for "Farms & Crops management UI".
+- **Uncommitted**: Farms/FarmDetail/Crops UI, form dialogs, ConfirmDialog, form-field, Home + MenuDrawer + App + api.js changes, the full animation system (§11), and the bug-fix/hardening pass (§12).
+- Verify with `npm run lint`, `npm run typecheck`, `npm run build` before committing.
 
 ---
 
@@ -279,3 +288,39 @@ See `DEPLOYMENT.md` for detailed instructions. Options include:
 - Photo upload / leaf-disease detection via AI
 - Expand language coverage to all UI strings
 - CI/CD pipeline (GitHub Actions for automated tests + deploy)
+
+---
+
+## 11. Animation System
+
+- `src/lib/animation.js` wraps **animejs v4** (which uses **named exports only** — import `{ animate as anime, stagger }`, there is no default export). Helpers: `animateEntrance`, `animateStaggerEntrance`, `animateScalePop`, `animatePress`/`animateRelease`, `animateProgress`, `animateCount`, `animateSlideFadeIn/Out`, `animateFloat`, `animateBreathe`, `animateSuccessBurst`, `animateShake`, plus `useScrollReveal()` and `useReducedMotion()`.
+- `prefersReducedMotion()` is exported; components gate all JS animations on it. **Important:** elements set to `opacity: 0` and only revealed by JS must set `opacity: 1` in the reduced-motion branch, or content stays invisible for those users.
+- `PageTransition` renders the `<Outlet>` directly (it forwards an optional `outletContext` prop) — do not nest a second `<Outlet>` around it.
+
+## 12. Bug-fix / Hardening Pass (uncommitted)
+
+Everything below now verified with `npm run lint`, `npm run build`, `npm run typecheck` passing:
+
+- **App-crash fix**: `AppLayout` now passes `outletContext` into `PageTransition`, which forwards it to its `<Outlet>` so `PageHeader`'s `useOutletContext().openMenu/openLanguage` no longer throws.
+- **`src/lib/api.js`**:
+  - `request()` parses JSON via `text()` + `JSON.parse` and returns `null` on `204`, so `DELETE /farms|/crops` no longer fails on empty responses.
+  - 401 session-expiry redirect is **skipped for `/auth/*`** endpoints so a failed login shows the real error instead of "session expired".
+  - Errors carry a `status` property (fixes Crops 401 detection).
+  - `getWeather` no longer drops valid `(0,0)` coordinates.
+  - Added `resetPasswordRequest`/`resetPassword`.
+- **`src/lib/AuthContext.jsx`**: `login()` is now awaitable (awaited by Login/Register before navigating, fixing the transient login-screen flash); `logout()` clears all three token keys and the React Query cache.
+- **Removed `db.*` ghost calls** in `ForgotPassword`, `ResetPassword`, `PageNotFound` (replaced with `api.*`); wired `/forgot-password` and `/reset-password` routes.
+- **`src/pages/Home.jsx`**: `Promise.all` → `Promise.allSettled` (one failing endpoint no longer blanks the dashboard), guarded `rec.action.split`, fallback `topMarket`, enabled alert "Check" link, reduced-motion scheme cards no longer stuck at `opacity:0`.
+- **`src/pages/Market.jsx`**: normalized `trend`/`suggestion` to known keys to prevent `Element type is invalid` crashes.
+- **`src/pages/AI.jsx`**: `TypingText` guards non-string text; AI response fields normalized before append.
+- **`src/pages/FarmDetail.jsx`**: repaired corrupted UTF-8 (garbled Hindi + emoji).
+- **`src/pages/Crops.jsx`**: real 401 detection via `e.status`, "Check leaf" quick action navigates to `/ai`.
+- **`src/components/ui/OfflineIndicator.jsx`**: subscribes to `online`/`offline` events (was hardcoded online).
+- **`src/components/mascot/KisaanMascot.jsx`**: removed dead `onSuccess`/celebration logic and effect churn.
+- **`src/components/ProtectedRoute.jsx`**: `checkUserAuth` → `checkAuth` (dead code, latent crash removed).
+- **Wired previously-dead buttons**: Reports download (visual state), OfflineDownloads save (stateful), VerifiedAdvisories read-more (expandable body), Help cards (`tel:`/WhatsApp links), RecommendationCard Do-it/Wait + Why (toggle/expand). Added `done` translation key across all 7 languages.
+- **Persistence**: language and theme now persist to `localStorage` (`kisaan_lang`, `kisaan_theme`).
+- **`jsconfig.json`** created so `npm run typecheck` works (was pointing at a missing file).
+- **White-screen crash fix (animejs v3→v4 migration)**: `src/lib/animation.js` called `anime({ targets, ... })` (v3 style) and returned `.finished`, but the installed **animejs v4.5.0** requires `animate(targets, params)` and returns a thenable animation object — the old signature passed the config as `targets`, leaving `parameters` `undefined` and throwing `Cannot read properties of undefined (reading 'keyframes')` inside `JSAnimation`. Rewrote all 13 helpers to `animate(targets, { ... })`, replaced string `cubicBezier(...)`/`easeInOutSine` easings with the v4 `cubicBezier()`/`eases.inOutSine` functions, and return the animation object (thenable) so existing `.then()` / `Promise.all` / `.pause()` consumers keep working.
+- **DOM nesting fix**: `AuthLayout` rendered the `footer` prop inside a `<p>` while `Login`/`Settings` pass block-level `<div>`s in it (React `validateDOMNesting` warning). The footer container is now a `<div>` (same classes, no visual change).
+- Verified: `npm run lint`, `npm run typecheck`, `npm run build` (1804 modules) all pass; dev server boots and serves `HTTP 200`.

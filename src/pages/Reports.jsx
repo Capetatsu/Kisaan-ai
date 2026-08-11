@@ -1,13 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import GlassCard from '@/components/ui/GlassCard';
 import PageHeader from '@/components/layout/PageHeader';
-import { FileText, Download } from 'lucide-react';
+import { FileText, Download, CheckCircle2 } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { reports } from '@/lib/mockData';
 
 export default function Reports() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
+  const [downloaded, setDownloaded] = useState({});
+
+  const handleDownload = (r) => {
+    setDownloaded((prev) => ({ ...prev, [r.id]: true }));
+    setTimeout(() => {
+      setDownloaded((prev) => ({ ...prev, [r.id]: false }));
+    }, 2000);
+  };
+
   return (
     <div className="space-y-4">
       <PageHeader title={t('reports')} subtitle={isHindi ? 'अपनी रिपोर्ट देखें' : 'View your reports'} />
@@ -20,9 +29,19 @@ export default function Reports() {
             <p className="font-bold text-sm truncate">{isHindi ? r.titleHi : r.title}</p>
             <p className="text-xs text-muted-foreground">{r.date} · {r.type}</p>
           </div>
-          <button className="grid place-items-center h-9 w-9 rounded-lg glass text-primary active:scale-90 transition-transform">
-            <Download className="h-4 w-4" />
-          </button>
+          {downloaded[r.id] ? (
+            <span className="grid place-items-center h-9 w-9 rounded-lg bg-primary/12 text-primary shrink-0">
+              <CheckCircle2 className="h-4 w-4" />
+            </span>
+          ) : (
+            <button
+              onClick={() => handleDownload(r)}
+              className="grid place-items-center h-9 w-9 rounded-lg glass text-primary active:scale-90 transition-transform"
+              aria-label={isHindi ? 'डाउनलोड' : 'Download'}
+            >
+              <Download className="h-4 w-4" />
+            </button>
+          )}
         </GlassCard>
       ))}
     </div>

@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { useOutletContext } from 'react-router-dom';
 import GlassCard from '@/components/ui/GlassCard';
 import StatusChip from '@/components/ui/StatusChip';
 import PageHeader from '@/components/layout/PageHeader';
-import { Send, Mic, Camera, Sparkles, ArrowRight, Landmark } from 'lucide-react';
+import { Send, Mic, Camera, Sparkles, ArrowRight, Landmark, ChevronUp } from 'lucide-react';
+import KisaanMascot from '@/components/mascot/KisaanMascot';
 import { useLang } from '@/lib/languageContext';
 import { quickSuggestions } from '@/lib/mockData';
 import { api } from '@/lib/api';
@@ -35,6 +38,7 @@ function AiBubble({ msg, isHindi }) {
 
 export default function AI() {
   const { t, lang } = useLang();
+  const { aiNavOpen, setAiNavOpen } = useOutletContext() || {};
   const isHindi = lang === 'hi';
   const [thread, setThread] = useState([]);
   const [input, setInput] = useState('');
@@ -73,18 +77,59 @@ export default function AI() {
     }
   };
 
+  const typingBar = (
+    <div className="glass-strong rounded-[1.5rem] p-2 flex items-center gap-2 shadow-2xl overflow-hidden transition-all duration-300 ease-in-out">
+      <button onClick={() => setListening((l) => !l)}
+        className={`grid place-items-center h-10 w-10 rounded-xl shrink-0 transition-all tap-target ${listening ? 'bg-destructive text-destructive-foreground voice-glow' : 'bg-primary/12 text-primary'}`}>
+        <Mic className="h-5 w-5" />
+      </button>
+      <button className="grid place-items-center h-10 w-10 rounded-xl bg-muted text-muted-foreground shrink-0 tap-target active:scale-90 transition-transform">
+        <Camera className="h-5 w-5" />
+      </button>
+      <input
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && send(input)}
+        placeholder={t('ask_anything')}
+        className="flex-1 bg-transparent outline-none text-sm px-1 min-w-0"
+      />
+      <button onClick={() => send(input)} disabled={!input.trim() || sending}
+        className="grid place-items-center h-10 w-10 rounded-xl bg-primary text-primary-foreground shrink-0 disabled:opacity-40 active:scale-90 transition-transform tap-target">
+        <Send className="h-5 w-5" />
+      </button>
+      <button onClick={() => setAiNavOpen?.((prev) => !prev)}
+        className={`grid place-items-center rounded-full bg-accent text-white border-2 border-accent-edge shadow-[0_4px_0_hsl(var(--accent-edge))] active:translate-y-[2px] active:shadow-none transition-all duration-300 ease-in-out pointer-events-auto overflow-hidden ${aiNavOpen ? 'h-0 w-0 opacity-0 border-0 m-0 p-0' : 'h-10 w-10 opacity-100'}`}
+        aria-label="Show navigation">
+        <ChevronUp className="h-5 w-5 rotate-0" strokeWidth={2.6} />
+      </button>
+    </div>
+  );
+
   return (
-    <div className="relative animate-page-in space-y-4 pb-56">
+    <div className={`relative animate-page-in space-y-4 transition-all duration-300 ${aiNavOpen ? 'pb-56' : 'pb-36'}`}>
       <PageHeader title={t('nav_ai')} subtitle={isHindi ? 'आपका किसान सहायक' : t('farm_assistant')} />
 
       {/* Thread */}
       <div className="space-y-3">
         {thread.length === 0 && !sending && (
-          <GlassCard className="p-4 text-center animate-fade-up">
-            <Sparkles className="h-6 w-6 text-primary mx-auto mb-2" />
-            <p className="text-sm font-semibold">{isHindi ? 'अपनी फसल के बारे में पूछें' : 'Ask about your crops'}</p>
-            <p className="text-xs text-muted-foreground mt-1">{isHindi ? 'कीट, सिंचाई, कटाई, मंडी भाव — कुछ भी पूछें' : 'Pests, irrigation, harvest, mandi prices — ask anything'}</p>
-          </GlassCard>
+          <div className="rounded-3xl overflow-hidden animate-fade-up bg-accent border-4 border-accent-edge text-white relative">
+            <div className="px-5 pt-5 pb-4">
+              <div className="flex items-start justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-extrabold uppercase tracking-widest text-white/80">KISAAN AI</p>
+                  <p className="text-2xl font-extrabold font-heading mt-1 leading-tight drop-shadow-sm">
+                    {isHindi ? 'आपका खेत, आपका साथी' : 'Your farm, your buddy'}
+                  </p>
+                  <p className="text-xs font-bold mt-1.5 text-white/90 leading-relaxed">
+                    {isHindi ? 'कीट, सिंचाई, कटाई, मंडी भाव — कुछ भी पूछें' : 'Pests, irrigation, harvest, mandi prices — ask anything'}
+                  </p>
+                </div>
+                <div className="w-24 h-24 shrink-0 -mr-1">
+                  <KisaanMascot mood="happy" className="w-full h-full drop-shadow animate-float-soft" />
+                </div>
+              </div>
+            </div>
+          </div>
         )}
         {thread.map((m, i) => (
           m.role === 'user' ? (
@@ -108,9 +153,9 @@ export default function AI() {
         <div ref={endRef} />
       </div>
 
-      {/* Fixed bottom cluster: chips + input — sits above nav, never overlaps */}
-      <div className="fixed bottom-0 inset-x-0 z-30 px-4 pb-24">
-        <div className="mx-auto max-w-md space-y-2">
+      {/* Suggestion chips — kept in place */}
+      <div className={`fixed bottom-0 inset-x-0 z-30 px-4 pointer-events-none transition-all duration-300 ease-in-out ${aiNavOpen ? 'pb-24' : 'pb-3'}`}>
+        <div className="mx-auto max-w-md space-y-2 pointer-events-auto">
           <div className="flex gap-2 overflow-x-auto no-scrollbar">
             {quickSuggestions.map((q) => (
               <button key={q} onClick={() => send(q)}
@@ -119,28 +164,19 @@ export default function AI() {
               </button>
             ))}
           </div>
-          <div className="glass-strong rounded-[1.5rem] p-2 flex items-center gap-2 shadow-2xl">
-            <button onClick={() => setListening((l) => !l)}
-              className={`grid place-items-center h-10 w-10 rounded-xl shrink-0 transition-all tap-target ${listening ? 'bg-destructive text-destructive-foreground voice-glow' : 'bg-primary/12 text-primary'}`}>
-              <Mic className="h-5 w-5" />
-            </button>
-            <button className="grid place-items-center h-10 w-10 rounded-xl bg-muted text-muted-foreground shrink-0 tap-target active:scale-90 transition-transform">
-              <Camera className="h-5 w-5" />
-            </button>
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && send(input)}
-              placeholder={t('ask_anything')}
-              className="flex-1 bg-transparent outline-none text-sm px-1 min-w-0"
-            />
-            <button onClick={() => send(input)} disabled={!input.trim() || sending}
-              className="grid place-items-center h-10 w-10 rounded-xl bg-primary text-primary-foreground shrink-0 disabled:opacity-40 active:scale-90 transition-transform tap-target">
-              <Send className="h-5 w-5" />
-            </button>
-          </div>
+          <div aria-hidden className="h-[3.75rem]"></div>
         </div>
       </div>
+
+      {/* Typing bar — portaled to body so it anchors to the true viewport bottom */}
+      {createPortal(
+        <div className={`fixed bottom-0 inset-x-0 ${aiNavOpen ? 'z-30' : 'z-50'} px-4 pointer-events-none transition-all duration-300 ease-in-out ${aiNavOpen ? 'pb-24' : 'pb-3'}`}>
+          <div className="mx-auto max-w-md pointer-events-auto">
+            {typingBar}
+          </div>
+        </div>,
+        document.body
+      )}
     </div>
   );
 }

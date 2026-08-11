@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import FormField from '@/components/ui/form-field';
 import { Loader2, MapPin } from 'lucide-react';
 import { api } from '@/lib/api';
 import { useLang } from '@/lib/languageContext';
+import { animateSuccessBurst, prefersReducedMotion } from '@/lib/animation';
 
 const EMPTY = { name: '', soil_type: '', area: '', latitude: '', longitude: '' };
 
@@ -50,6 +51,7 @@ export default function FarmFormDialog({ open, onOpenChange, farm = null, onSave
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState(null);
+  const successRef = useRef(null);
 
   useEffect(() => {
     if (open) {
@@ -104,6 +106,9 @@ export default function FarmFormDialog({ open, onOpenChange, farm = null, onSave
       const saved = isEdit
         ? await api.updateFarm(farm.id, payload)
         : await api.createFarm(payload);
+      if (!prefersReducedMotion()) {
+        animateSuccessBurst(successRef.current);
+      }
       onSaved(saved);
       onOpenChange(false);
     } catch (err) {
@@ -117,7 +122,7 @@ export default function FarmFormDialog({ open, onOpenChange, farm = null, onSave
     <Dialog open={open} onOpenChange={(o) => { if (!saving) onOpenChange(o); }}>
       <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <span className="grid place-items-center h-11 w-11 rounded-2xl bg-primary/12 text-primary shrink-0 mb-1">
+          <span ref={successRef} className="grid place-items-center h-11 w-11 rounded-2xl bg-primary/12 text-primary shrink-0 mb-1">
             <MapPin className="h-5 w-5" />
           </span>
           <DialogTitle>

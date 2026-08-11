@@ -37,7 +37,7 @@ export default function Analytics() {
       </GlassCard>
       <GlassCard className="p-5 animate-fade-up">
         <div className="flex items-center gap-2 mb-4">
-          <Sprout className="h-5 w-5 text-accent-foreground" />
+          <Sprout className="h-5 w-5 text-accent" />
           <p className="font-bold text-sm">{isHindi ? 'उपज' : 'Yield'}</p>
         </div>
         <MiniBar data={analytics.yield} color="bg-accent" />
