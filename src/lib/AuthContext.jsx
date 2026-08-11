@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { queryClientInstance } from '@/lib/query-client';
 
 const AuthContext = createContext();
 
@@ -15,7 +16,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const checkAuth = async () => {
-    const token = localStorage.getItem('kisaan_token');
+    const token = localStorage.getItem('kisaan_token') || localStorage.getItem('base44_access_token') || localStorage.getItem('token');
     
     if (!token) {
       setIsLoadingAuth(false);
@@ -31,6 +32,8 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Auth check failed:', error);
       localStorage.removeItem('kisaan_token');
+      localStorage.removeItem('base44_access_token');
+      localStorage.removeItem('token');
       setIsAuthenticated(false);
     } finally {
       setIsLoadingAuth(false);
@@ -40,18 +43,21 @@ export const AuthProvider = ({ children }) => {
 
   const login = (token) => {
     localStorage.setItem('kisaan_token', token);
-    checkAuth();
+    return checkAuth();
   };
 
   const logout = () => {
     localStorage.removeItem('kisaan_token');
+    localStorage.removeItem('base44_access_token');
+    localStorage.removeItem('token');
+    queryClientInstance.clear();
     setUser(null);
     setIsAuthenticated(false);
     setAuthChecked(false);
   };
 
   const navigateToLogin = () => {
-    window.location.href = '/login';
+    window.location.href = '/register';
   };
 
   return (

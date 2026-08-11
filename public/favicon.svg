@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
+  <!-- body -->
+  <path d="M80 38 C 111 38 126 64 126 92 C 126 122 106 140 80 140 C 54 140 34 122 34 92 C 34 64 49 38 80 38 Z" fill="#5BB421"/>
+  <ellipse cx="80" cy="108" rx="27" ry="21" fill="#7ED23A" opacity="0.55"/>
+  <!-- head sprout -->
+  <path d="M80 40 C 80 32 80 28 80 22" stroke="#47971A" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M80 26 C 70 12 52 12 48 21 C 54 32 70 33 80 26 Z" fill="#47971A"/>
+  <path d="M80 26 C 90 10 108 10 112 19 C 106 31 90 33 80 26 Z" fill="#5BB421"/>
+  <!-- eyes -->
+  <circle cx="64" cy="78" r="11" fill="#fff"/>
+  <circle cx="96" cy="78" r="11" fill="#fff"/>
+  <circle cx="66" cy="78" r="6" fill="#3f3f3f"/>
+  <circle cx="98" cy="78" r="6" fill="#3f3f3f"/>
+  <circle cx="68" cy="76" r="2.5" fill="#fff"/>
+  <circle cx="100" cy="76" r="2.5" fill="#fff"/>
+  <!-- cheeks -->
+  <circle cx="52" cy="92" r="6" fill="#FF9600" opacity="0.35"/>
+  <circle cx="108" cy="92" r="6" fill="#FF9600" opacity="0.35"/>
+  <!-- mouth -->
+  <path d="M70 98 Q80 108 90 98" stroke="#3f3f3f" stroke-width="3" stroke-linecap="round" fill="none"/>
+  <!-- feet -->
+  <ellipse cx="62" cy="140" rx="11" ry="6.5" fill="#FF9600"/>
+  <ellipse cx="98" cy="140" rx="11" ry="6.5" fill="#FF9600"/>
+</svg>

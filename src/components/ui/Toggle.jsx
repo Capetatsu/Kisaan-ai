@@ -5,17 +5,18 @@ export default function Toggle({ checked, onChange, label }) {
   return (
     <button
       onClick={() => onChange(!checked)}
-      className={cn(
-        'relative inline-flex h-7 w-12 items-center rounded-full transition-colors tap-target shrink-0',
-        checked ? 'bg-primary' : 'bg-muted-foreground/25'
-      )}
-      aria-pressed={checked}
+      role="switch"
+      aria-checked={checked}
       aria-label={label}
+      className={cn(
+        'relative inline-flex h-8 w-[52px] items-center rounded-full border-2 px-[3px] transition-colors tap-target shrink-0',
+        checked ? 'bg-primary border-primary-edge' : 'bg-border border-border'
+      )}
     >
-      <span className={cn(
-        'inline-block h-5 w-5 rounded-full bg-white shadow transition-transform',
-        checked ? 'translate-x-6' : 'translate-x-1'
-      )} />
+      <span
+        className="inline-block h-6 w-6 rounded-full bg-white shadow-sm transition-transform"
+        style={{ transform: checked ? 'translateX(22px)' : 'translateX(0)' }}
+      />
     </button>
   );
 }

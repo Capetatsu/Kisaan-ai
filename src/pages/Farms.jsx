@@ -132,7 +132,7 @@ export default function Farms() {
     return (
       <div className="space-y-3">
         {farms.map((farm, index) => (
-          <GlassCard key={farm.id} className="p-4 animate-fade-up" style={{ animationDelay: `${index * 40}ms` }}>
+          <GlassCard key={farm.id} className={`p-4 animate-fade-up stagger-${Math.min(index + 1, 10)}`}>
             <div className="flex items-center gap-3">
               <span className="grid place-items-center h-12 w-12 rounded-2xl bg-primary/12 text-2xl shrink-0">
                 {soilEmoji[soilKey(farm.soil_type)] || '🌱'}

@@ -1,57 +1,128 @@
-import React, { useState } from 'react';
-import GlassCard from '@/components/ui/GlassCard';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PageHeader from '@/components/layout/PageHeader';
+import KisaanMascot from '@/components/mascot/KisaanMascot';
 import { AlertTriangle, CloudRain, TrendingUp, Leaf, Landmark, Phone } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { notifications } from '@/lib/mockData';
+import { animateStaggerEntrance, animateSlideFadeOut, prefersReducedMotion } from '@/lib/animation';
 
 const catMeta = {
-  urgent: { Icon: AlertTriangle, tone: 'bg-destructive/15 text-destructive' },
-  weather: { Icon: CloudRain, tone: 'bg-primary/12 text-primary' },
-  market: { Icon: TrendingUp, tone: 'bg-accent/20 text-accent-foreground' },
-  crop: { Icon: Leaf, tone: 'bg-warning/15 text-warning' },
-  government: { Icon: Landmark, tone: 'bg-chart-4/15 text-chart-4' },
-  help: { Icon: Phone, tone: 'bg-primary/12 text-primary' },
+  urgent: { Icon: AlertTriangle, cls: 'bg-berry/12 text-berry border-berry/25' },
+  weather: { Icon: CloudRain, cls: 'bg-water/12 text-water border-water/25' },
+  market: { Icon: TrendingUp, cls: 'bg-primary/12 text-primary border-primary/25' },
+  crop: { Icon: Leaf, cls: 'bg-tangerine/12 text-tangerine border-tangerine/25' },
+  government: { Icon: Landmark, cls: 'bg-accent/12 text-accent border-accent/25' },
+  help: { Icon: Phone, cls: 'bg-sun/15 text-sun border-sun/30' },
 };
 
 const cats = ['urgent', 'crop', 'market', 'weather', 'government', 'help'];
 
+const catDot = {
+  urgent: 'bg-berry',
+  crop: 'bg-tangerine',
+  market: 'bg-primary',
+  weather: 'bg-water',
+  government: 'bg-accent',
+  help: 'bg-sun',
+};
+
+function NotificationCard({ n, isHindi, index }) {
+  const { Icon, cls } = catMeta[n.cat];
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (prefersReducedMotion()) {
+      el.style.opacity = '1';
+      return;
+    }
+    const delay = index * 60;
+    const timer = setTimeout(() => {
+      animateStaggerEntrance([el], { delay });
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [index, n.id]);
+
+  return (
+    <div ref={ref} key={n.id} className="glass p-4 flex items-start gap-3 rounded-2xl notification-card border border-water/10" style={{ opacity: 0 }}>
+      <span className={`relative grid place-items-center h-11 w-11 rounded-xl border-2 shrink-0 ${cls}`}>
+        <Icon className="h-5 w-5" strokeWidth={2.5} />
+        <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-card ${catDot[n.cat]}`} />
+      </span>
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="font-extrabold text-sm truncate">{isHindi ? n.titleHi : n.title}</p>
+          <span className="text-[10px] text-muted-foreground font-bold ml-auto shrink-0">{n.time}</span>
+        </div>
+        <p className="text-xs text-muted-foreground font-semibold mt-1">{isHindi ? n.body : n.body}</p>
+      </div>
+    </div>
+  );
+}
+
 export default function Notifications() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
-  const [filter, setFilter] = useState('all');
-  const list = filter === 'all' ? notifications : notifications.filter((n) => n.cat === filter);
+  const [displayFilter, setDisplayFilter] = useState('all');
+  const [transitioning, setTransitioning] = useState(false);
+  const listRef = useRef(null);
+  const prevFilterRef = useRef('all');
+
+  const list = displayFilter === 'all' ? notifications : notifications.filter((n) => n.cat === displayFilter);
+
+  const handleFilterChange = useCallback((newFilter) => {
+    if (newFilter === prevFilterRef.current || transitioning) return;
+    setTransitioning(true);
+
+    const container = listRef.current;
+    const cards = container ? container.querySelectorAll('.notification-card') : [];
+
+    if (prefersReducedMotion() || cards.length === 0) {
+      setDisplayFilter(newFilter);
+      prevFilterRef.current = newFilter;
+      setTransitioning(false);
+      return;
+    }
+
+    const promises = Array.from(cards).map((el, i) =>
+      animateSlideFadeOut(el, 'down', { delay: i * 30, duration: 180 })
+    );
+
+    Promise.all(promises).then(() => {
+      setDisplayFilter(newFilter);
+      prevFilterRef.current = newFilter;
+      setTransitioning(false);
+    });
+  }, [transitioning]);
 
   return (
     <div className="space-y-4">
-      <PageHeader title={t('notifications')} />
+      <PageHeader title={t('notifications')} subtitle={isHindi ? 'सभी सूचनाएँ' : 'all alerts'} />
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
-        <button onClick={() => setFilter('all')}
-          className={`px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-primary text-primary-foreground' : 'glass'}`}>
+        <button onClick={() => handleFilterChange('all')}
+          className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap transition-all tap-target ${displayFilter === 'all' ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}>
           {isHindi ? 'सभी' : 'All'}
         </button>
-        {cats.map((c) => (
-          <button key={c} onClick={() => setFilter(c)}
-            className={`px-3.5 py-2 rounded-full text-xs font-bold whitespace-nowrap capitalize transition-all ${filter === c ? 'bg-primary text-primary-foreground' : 'glass'}`}>
+        {cats.map((c, i) => (
+          <button key={c} onClick={() => handleFilterChange(c)}
+            className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap capitalize transition-all tap-target animate-chip-slide ${displayFilter === c ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}
+            style={{ animationDelay: `${i * 0.04}s` }}>
             {t(c)}
           </button>
         ))}
       </div>
-      {list.map((n) => {
-        const { Icon, tone } = catMeta[n.cat];
-        return (
-          <GlassCard key={n.id} className="p-4 flex items-start gap-3 animate-fade-up">
-            <span className={`grid place-items-center h-10 w-10 rounded-xl shrink-0 ${tone}`}><Icon className="h-5 w-5" /></span>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="font-bold text-sm truncate">{isHindi ? n.titleHi : n.title}</p>
-                <span className="text-[10px] text-muted-foreground ml-auto shrink-0">{n.time}</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-0.5">{n.body}</p>
-            </div>
-          </GlassCard>
-        );
-      })}
+      <div ref={listRef} className="space-y-3">
+        {list.map((n, index) => (
+          <NotificationCard key={n.id} n={n} isHindi={isHindi} index={index} />
+        ))}
+      </div>
+      {list.length === 0 && (
+        <div className="glass p-8 text-center animate-scale-in">
+          <KisaanMascot mood="happy" className="w-24 h-24 mx-auto mb-2" />
+          <p className="text-sm font-extrabold text-muted-foreground">{isHindi ? 'कोई सूचनाएँ नहीं' : 'No notifications'}</p>
+        </div>
+      )}
     </div>
   );
 }

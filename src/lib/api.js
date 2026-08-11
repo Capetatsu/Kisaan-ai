@@ -50,19 +50,24 @@ const request = async (path, options = {}) => {
 
   if (!response.ok) {
     const error = await response.json().catch(() => ({}));
+    const err = new Error(buildError(error.detail) || `Request failed: ${response.status}`);
+    err.status = response.status;
 
-    if (response.status === 401) {
+    if (response.status === 401 && !path.startsWith('/auth/')) {
       clearStoredToken();
       if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
-      throw new Error('Your session has expired. Please log in again.');
+      err.message = 'Your session has expired. Please log in again.';
     }
 
-    throw new Error(buildError(error.detail) || `Request failed: ${response.status}`);
+    throw err;
   }
 
-  return response.json();
+  if (response.status === 204) return null;
+
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 };
 
 export const api = {
@@ -70,6 +75,8 @@ export const api = {
   register: (data) => request('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
   login: (data) => request('/auth/login', { method: 'POST', body: JSON.stringify(data) }),
   me: () => request('/users/me'),
+  resetPasswordRequest: (email) => request('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: ({ resetToken, newPassword }) => request('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token: resetToken, password: newPassword }) }),
 
   // Farms
   getFarms: () => request('/farms'),
@@ -87,7 +94,7 @@ export const api = {
 
   // Insights
   askAI: (data) => request('/insights/ai/ask', { method: 'POST', body: JSON.stringify(data) }),
-  getWeather: (lat, lon) => request(`/insights/weather${lat && lon ? `?latitude=${lat}&longitude=${lon}` : ''}`),
+  getWeather: (lat, lon) => request(`/insights/weather${lat !== undefined && lat !== null && lon !== undefined && lon !== null ? `?latitude=${lat}&longitude=${lon}` : ''}`),
   getMarketPrices: () => request('/insights/market/prices'),
   getNearbyMandi: () => request('/insights/market/mandi'),
 };

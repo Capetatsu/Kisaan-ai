@@ -117,10 +117,10 @@ export default function FarmDetail() {
   );
 
   return (
-    <div className="space-y-4 pb-4">
+    <div className="space-y-4 pb-4 animate-page-in">
       <div className="flex items-center gap-2 pt-3">
         <button onClick={() => navigate(-1)} className="grid place-items-center h-9 w-9 rounded-full glass active:scale-90 transition-transform" aria-label="Back">
-          <ArrowLeft className="h-4.5 w-4.5" />
+          <ArrowLeft className="h-5 w-5" />
         </button>
         <div className="flex-1 min-w-0">
           <h1 className="text-base font-bold font-heading truncate">{farm?.name || (isHindi ? 'फार्म' : 'Farm')}</h1>
@@ -146,21 +146,21 @@ export default function FarmDetail() {
           <GlassCard strong className="p-4 animate-fade-up">
             <div className="grid grid-cols-2 gap-3">
               <div className="flex items-center gap-2">
-                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><Mountain className="h-4.5 w-4.5" /></span>
+                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><Mountain className="h-5 w-5" /></span>
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">Soil</p>
                   <p className="text-sm font-bold capitalize truncate">{farm.soil_type}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><Ruler className="h-4.5 w-4.5" /></span>
+                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><Ruler className="h-5 w-5" /></span>
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">Area</p>
                   <p className="text-sm font-bold truncate">{farm.area}</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 col-span-2">
-                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><MapPin className="h-4.5 w-4.5" /></span>
+                <span className="grid place-items-center h-9 w-9 rounded-xl bg-primary/12 text-primary shrink-0"><MapPin className="h-5 w-5" /></span>
                 <div className="min-w-0">
                   <p className="text-[10px] text-muted-foreground">Location</p>
                   <p className="text-sm font-bold truncate">{farm.latitude}, {farm.longitude}</p>
@@ -193,7 +193,7 @@ export default function FarmDetail() {
           ) : (
             <div className="space-y-3">
               {crops.map((crop, index) => (
-                <GlassCard key={crop.id} className="p-4 animate-fade-up" style={{ animationDelay: `${index * 40}ms` }}>
+                <GlassCard key={crop.id} className={`p-4 animate-fade-up stagger-${Math.min(index + 1, 10)}`}>
                   <div className="flex items-center gap-3">
                     <span className="grid place-items-center h-12 w-12 rounded-2xl bg-primary/12 text-2xl shrink-0">
                       {cropEmojis[crop.name.toLowerCase()] || '🌱'}
