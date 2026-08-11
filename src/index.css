@@ -63,6 +63,9 @@
     --chart-3: 197 90% 54%;
     --chart-4: 168 72% 40%;
     --chart-5: 268 92% 66%;
+    --hero-water: 197 90% 54%;
+    --hero-accent: 268 92% 66%;
+    --hero-primary: 102 69% 41%;
   }
 
   .dark {
@@ -117,6 +120,9 @@
     --chart-3: 197 90% 58%;
     --chart-4: 168 72% 48%;
     --chart-5: 268 92% 70%;
+    --hero-water: 197 80% 32%;
+    --hero-accent: 268 75% 42%;
+    --hero-primary: 102 60% 28%;
   }
 }
 
@@ -268,4 +274,59 @@
   .animate-slide-down { animation: slide-down 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .animate-page-in { animation: page-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both; }
   .animate-wiggle { animation: wiggle 1.6s ease-in-out infinite; }
+
+  /* Stagger delays for card/list entrance animations */
+  .stagger-1 { animation-delay: 0ms; }
+  .stagger-2 { animation-delay: 60ms; }
+  .stagger-3 { animation-delay: 120ms; }
+  .stagger-4 { animation-delay: 180ms; }
+  .stagger-5 { animation-delay: 240ms; }
+  .stagger-6 { animation-delay: 300ms; }
+  .stagger-7 { animation-delay: 360ms; }
+  .stagger-8 { animation-delay: 420ms; }
+  .stagger-9 { animation-delay: 480ms; }
+  .stagger-10 { animation-delay: 540ms; }
+
+  /* Success flash */
+  @keyframes success-flash {
+    0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.4); }
+    50% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+    100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+  }
+  .animate-success-flash { animation: success-flash 0.6s ease-out; }
+
+  /* Bar chart grow */
+  @keyframes bar-grow {
+    from { transform: scaleY(0); }
+    to { transform: scaleY(1); }
+  }
+  .animate-bar-grow { animation: bar-grow 0.5s cubic-bezier(0.22, 1, 0.36, 1) both; transform-origin: bottom; }
+
+  /* Nav bounce */
+  @keyframes nav-bounce {
+    0% { transform: scale(1); }
+    30% { transform: scale(0.97); }
+    60% { transform: scale(1.03); }
+    100% { transform: scale(1); }
+  }
+  .animate-nav-bounce { animation: nav-bounce 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+}
+
+/* Respect reduced-motion preference for ALL CSS animations */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse-glow,
+  .animate-float-soft,
+  .animate-orb-pulse,
+  .animate-fade-up,
+  .animate-slide-in-right,
+  .animate-slide-down,
+  .animate-page-in,
+  .animate-wiggle,
+  .animate-bar-grow,
+  .animate-success-flash,
+  .animate-nav-bounce {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import PageHeader from '@/components/layout/PageHeader';
 import KisaanMascot from '@/components/mascot/KisaanMascot';
 import { AlertTriangle, CloudRain, TrendingUp, Leaf, Landmark, Phone } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { notifications } from '@/lib/mockData';
-import { animateStaggerEntrance, prefersReducedMotion } from '@/lib/animation';
+import { animateStaggerEntrance, animateSlideFadeOut, prefersReducedMotion } from '@/lib/animation';
 
 const catMeta = {
   urgent: { Icon: AlertTriangle, cls: 'bg-berry/12 text-berry border-berry/25' },
@@ -42,10 +42,10 @@ function NotificationCard({ n, isHindi, index }) {
       animateStaggerEntrance([el], { delay });
     }, delay);
     return () => clearTimeout(timer);
-  }, [index]);
+  }, [index, n.id]);
 
   return (
-    <div ref={ref} key={n.id} className="glass p-4 flex items-start gap-3 rounded-2xl" style={{ opacity: 0 }}>
+    <div ref={ref} key={n.id} className="glass p-4 flex items-start gap-3 rounded-2xl notification-card border border-water/10" style={{ opacity: 0 }}>
       <span className={`relative grid place-items-center h-11 w-11 rounded-xl border-2 shrink-0 ${cls}`}>
         <Icon className="h-5 w-5" strokeWidth={2.5} />
         <span className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-card ${catDot[n.cat]}`} />
@@ -65,26 +65,60 @@ export default function Notifications() {
   const { t, lang } = useLang();
   const isHindi = lang === 'hi';
   const [filter, setFilter] = useState('all');
-  const list = filter === 'all' ? notifications : notifications.filter((n) => n.cat === filter);
+  const [displayFilter, setDisplayFilter] = useState('all');
+  const [transitioning, setTransitioning] = useState(false);
+  const listRef = useRef(null);
+  const prevFilterRef = useRef('all');
+
+  const list = displayFilter === 'all' ? notifications : notifications.filter((n) => n.cat === displayFilter);
+
+  const handleFilterChange = useCallback((newFilter) => {
+    if (newFilter === prevFilterRef.current || transitioning) return;
+    setTransitioning(true);
+
+    const container = listRef.current;
+    const cards = container ? container.querySelectorAll('.notification-card') : [];
+
+    if (prefersReducedMotion() || cards.length === 0) {
+      setDisplayFilter(newFilter);
+      prevFilterRef.current = newFilter;
+      setFilter(newFilter);
+      setTransitioning(false);
+      return;
+    }
+
+    const promises = Array.from(cards).map((el, i) =>
+      animateSlideFadeOut(el, 'down', { delay: i * 30, duration: 180 })
+    );
+
+    Promise.all(promises).then(() => {
+      setDisplayFilter(newFilter);
+      setFilter(newFilter);
+      prevFilterRef.current = newFilter;
+      setTransitioning(false);
+    });
+  }, [transitioning]);
 
   return (
     <div className="space-y-4">
       <PageHeader title={t('notifications')} subtitle={isHindi ? 'सभी सूचनाएँ' : 'all alerts'} />
       <div className="flex gap-2 overflow-x-auto no-scrollbar -mx-4 px-4">
-        <button onClick={() => setFilter('all')}
-          className={`px-4 py-2.5 rounded-full text-xs font-extrabold whitespace-nowrap transition-all tap-target ${filter === 'all' ? 'bg-primary text-white border-2 border-primary-edge shadow-duo' : 'glass border-2'}`}>
+        <button onClick={() => handleFilterChange('all')}
+          className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap transition-all tap-target ${displayFilter === 'all' ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}>
           {isHindi ? 'सभी' : 'All'}
         </button>
         {cats.map((c) => (
-          <button key={c} onClick={() => setFilter(c)}
-            className={`px-4 py-2.5 rounded-full text-xs font-extrabold whitespace-nowrap capitalize transition-all tap-target ${filter === c ? 'bg-primary text-white border-2 border-primary-edge shadow-duo' : 'glass border-2'}`}>
+          <button key={c} onClick={() => handleFilterChange(c)}
+            className={`shrink-0 px-3 py-2 rounded-full text-xs font-extrabold whitespace-nowrap capitalize transition-all tap-target ${displayFilter === c ? 'bg-water text-white border-2 border-water-edge shadow-duo' : 'glass border-2'}`}>
             {t(c)}
           </button>
         ))}
       </div>
-      {list.map((n, index) => (
-        <NotificationCard key={n.id} n={n} isHindi={isHindi} index={index} />
-      ))}
+      <div ref={listRef} className="space-y-3">
+        {list.map((n, index) => (
+          <NotificationCard key={n.id} n={n} isHindi={isHindi} index={index} />
+        ))}
+      </div>
       {list.length === 0 && (
         <div className="glass p-8 text-center animate-fade-up">
           <KisaanMascot mood="happy" className="w-24 h-24 mx-auto mb-2" />

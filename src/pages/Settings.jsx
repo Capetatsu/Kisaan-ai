@@ -31,7 +31,7 @@ export default function Settings() {
       <PageHeader title={t('settings')} />
 
       {/* Profile section */}
-      <GlassCard strong className="p-5 animate-fade-up">
+      <GlassCard strong className="p-5 animate-fade-up stagger-1">
         <div className="flex items-center gap-3 mb-4">
           <span className="grid place-items-center h-14 w-14 rounded-2xl bg-primary text-primary-foreground shrink-0">
             <User className="h-7 w-7" />
@@ -61,7 +61,7 @@ export default function Settings() {
         </button>
       </GlassCard>
 
-      <GlassCard className="p-4 divide-y divide-border animate-fade-up">
+      <GlassCard className="p-4 divide-y divide-border animate-fade-up stagger-2">
         <Row Icon={theme === 'dark' ? Moon : Sun} label={theme === 'dark' ? 'Dark mode' : 'Light mode'}>
           <Toggle checked={theme === 'dark'} onChange={toggleTheme} />
         </Row>
@@ -83,7 +83,7 @@ export default function Settings() {
           <Toggle checked={voice} onChange={setVoice} />
         </Row>
       </GlassCard>
-      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up">
+      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up stagger-3">
         <Database className="h-5 w-5 text-primary shrink-0" />
         <p className="text-xs text-muted-foreground">{t('last_synced')} 2m · {t('cached_advice')}</p>
       </GlassCard>

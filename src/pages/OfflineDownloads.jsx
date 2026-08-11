@@ -24,7 +24,7 @@ export default function OfflineDownloads() {
   return (
     <div className="space-y-4">
       <PageHeader title={t('offline_downloads')} subtitle={isHindi ? 'बिना इंटरनेट उपयोग' : 'Use without internet'} />
-      <GlassCard strong className="p-5 flex items-center gap-4 animate-fade-up">
+      <GlassCard strong className="p-5 flex items-center gap-4 animate-fade-up stagger-1">
         <span className="grid place-items-center h-12 w-12 rounded-2xl bg-primary text-primary-foreground shrink-0">
           <Cloud className="h-6 w-6" />
         </span>
@@ -34,11 +34,11 @@ export default function OfflineDownloads() {
         </div>
         <StatusChip tone="green">{t('online')}</StatusChip>
       </GlassCard>
-      {offlineFiles.map((f) => {
+      {offlineFiles.map((f, i) => {
         const saved = savedIds.has(f.id);
         const saving = savingId === f.id;
         return (
-          <GlassCard key={f.id} className="p-4 flex items-center gap-3 animate-fade-up">
+          <GlassCard key={f.id} className={`p-4 flex items-center gap-3 animate-fade-up stagger-${i + 2}`}>
             <span className="grid place-items-center h-10 w-10 rounded-xl bg-primary/12 text-primary shrink-0">
               {saved ? <CheckCircle2 className="h-5 w-5" /> : <Download className="h-5 w-5" />}
             </span>

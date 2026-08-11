@@ -106,7 +106,7 @@ export default function Home() {
         />
 
         {/* Emergency alert */}
-        <div className="rounded-2xl border-[3px] border-berry bg-berry/10 p-4 flex items-center gap-3 animate-fade-up">
+        <div className="rounded-2xl border-[3px] border-berry bg-berry/10 p-4 flex items-center gap-3 animate-fade-up stagger-1">
           <span className="grid place-items-center h-11 w-11 rounded-xl bg-berry text-white shrink-0 shadow-duo">
             <AlertTriangle className="h-5 w-5" strokeWidth={2.6} />
           </span>
@@ -118,7 +118,8 @@ export default function Home() {
         </div>
 
         {/* Weather hero — big colorful section */}
-        <div className="rounded-3xl overflow-hidden animate-fade-up bg-water border-4 border-water-edge text-white relative">
+        <div className="rounded-3xl overflow-hidden animate-fade-up stagger-2 border-4 text-white relative"
+          style={{ backgroundColor: 'hsl(var(--hero-water))', borderColor: 'hsl(var(--water-edge))' }}>
           <div className="relative px-5 pt-5 pb-4">
             <div className="flex items-start justify-between">
               <div>
@@ -154,7 +155,7 @@ export default function Home() {
         {aiRec && <RecommendationCard rec={aiRec} isHindi={isHindi} />}
 
         {/* Continue last — compact */}
-        <div className="glass rounded-2xl p-3.5 flex items-center gap-3 animate-fade-up">
+        <div className="glass rounded-2xl p-3.5 flex items-center gap-3 animate-fade-up stagger-4">
           <span className="grid place-items-center h-11 w-11 rounded-xl bg-accent/12 text-accent shrink-0">
             <RotateCcw className="h-5 w-5" strokeWidth={2.5} />
           </span>
@@ -168,7 +169,7 @@ export default function Home() {
         {/* Crop status */}
         {mainCrop ? (
           <Link to="/crops">
-            <div className="glass rounded-2xl p-4 animate-fade-up">
+            <div className="glass rounded-2xl p-4 animate-fade-up stagger-5">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-xs font-extrabold text-muted-foreground uppercase tracking-wide">{t('crop_status')}</p>
                 <StatusChip tone={mainCrop.status === 'HARVESTED' ? 'green' : mainCrop.status === 'GROWING' ? 'amber' : 'muted'}>{mainCrop.status}</StatusChip>
@@ -187,7 +188,7 @@ export default function Home() {
           </Link>
         ) : (
           <Link to="/farms">
-            <div className="glass rounded-2xl p-4 flex items-center gap-3 animate-fade-up border-[3px] border-primary/20">
+            <div className="glass rounded-2xl p-4 flex items-center gap-3 animate-fade-up stagger-5 border-[3px] border-primary/20">
               <span className="grid place-items-center h-11 w-11 rounded-xl bg-primary/12 text-primary shrink-0">
                 <Sprout className="h-5 w-5" strokeWidth={2.5} />
               </span>
@@ -202,7 +203,7 @@ export default function Home() {
 
         {/* Market tip */}
         <Link to="/market">
-          <div className="glass rounded-2xl p-4 flex items-center gap-3 animate-fade-up border-[3px] border-water/20">
+          <div className="glass rounded-2xl p-4 flex items-center gap-3 animate-fade-up stagger-6 border-[3px] border-water/20">
             <span className="grid place-items-center h-11 w-11 rounded-xl bg-water/12 text-water shrink-0">
               <TrendingUp className="h-5 w-5" strokeWidth={2.5} />
             </span>

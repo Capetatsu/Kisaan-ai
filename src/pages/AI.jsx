@@ -44,6 +44,7 @@ export default function AI() {
   const [input, setInput] = useState('');
   const [listening, setListening] = useState(false);
   const [sending, setSending] = useState(false);
+  const [sendBounce, setSendBounce] = useState(false);
   const endRef = useRef(null);
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [thread]);
@@ -94,7 +95,8 @@ export default function AI() {
         className="flex-1 bg-transparent outline-none text-sm px-1 min-w-0"
       />
       <button onClick={() => send(input)} disabled={!input.trim() || sending}
-        className="grid place-items-center h-10 w-10 rounded-xl bg-primary text-primary-foreground shrink-0 disabled:opacity-40 active:scale-90 transition-transform tap-target">
+        className="grid place-items-center h-10 w-10 rounded-full bg-primary text-primary-foreground shrink-0 border-2 border-primary-edge disabled:opacity-40 active:translate-y-[2px] active:shadow-none transition-transform tap-target"
+        style={{ boxShadow: '0 3px 0 #1A5C0A, 0 4px 10px -2px rgba(0,0,0,0.2)' }}>
         <Send className="h-5 w-5" />
       </button>
       <button onClick={() => setAiNavOpen?.((prev) => !prev)}

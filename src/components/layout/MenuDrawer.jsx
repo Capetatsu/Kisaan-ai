@@ -111,35 +111,37 @@ export default function MenuDrawer({ open, onClose, seniorMode, setSeniorMode, o
 
         <div className="h-[2px] mx-5 bg-border/60" />
 
-        {/* Notifications */}
-        <NavLink to="/notifications" onClick={handleClose}
-          className="flex items-center justify-between mx-3 mt-3 px-4 py-3.5 rounded-2xl bg-berry/10 border-2 border-berry/25 active:scale-[0.98] transition-transform">
-          <span className="flex items-center gap-3 font-extrabold text-berry"><Bell className="h-5 w-5" strokeWidth={2.5} />{t('notifications')}</span>
-          <span className="grid place-items-center h-6 w-6 rounded-full bg-berry text-white text-[11px] font-extrabold">3</span>
-        </NavLink>
+        <div className="flex-1 flex flex-col bg-primary/5 rounded-b-l-[2rem] overflow-hidden">
+          {/* Notifications */}
+          <NavLink to="/notifications" onClick={handleClose}
+            className="flex items-center justify-between mx-3 mt-3 px-4 py-3.5 rounded-2xl bg-berry/10 border-2 border-berry/25 active:scale-[0.98] transition-transform">
+            <span className="flex items-center gap-3 font-extrabold text-berry"><Bell className="h-5 w-5" strokeWidth={2.5} />{t('notifications')}</span>
+            <span className="grid place-items-center h-6 w-6 rounded-full bg-berry text-white text-[11px] font-extrabold">3</span>
+          </NavLink>
 
-        {/* Nav items */}
-        <nav className="flex-1 overflow-y-auto no-scrollbar px-3 py-3 space-y-1.5">
-          {menuItems.map(({ to, key, Icon, color }) => (
-            <NavLink key={to} to={to} onClick={handleClose}
-              className={({ isActive }) =>
-                `opt-duo ${isActive ? 'opt-duo-active' : ''}`
-              }>
-              <Icon className={`h-5 w-5 ${color}`} strokeWidth={2.3} />
-              <span className="flex-1">{t(key)}</span>
-            </NavLink>
-          ))}
-        </nav>
+          {/* Nav items */}
+          <nav className="flex-1 overflow-y-auto no-scrollbar px-3 py-3 space-y-1.5">
+            {menuItems.map(({ to, key, Icon, color }) => (
+              <NavLink key={to} to={to} onClick={handleClose}
+                className={({ isActive }) =>
+                  `opt-duo ${isActive ? 'opt-duo-active' : ''}`
+                }>
+                <Icon className={`h-5 w-5 ${color}`} strokeWidth={2.3} />
+                <span className="flex-1">{t(key)}</span>
+              </NavLink>
+            ))}
+          </nav>
 
-        <div className="p-4">
-          <button
-            onClick={() => {
-              logout();
-              navigateToLogin();
-            }}
-            className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl w-full font-extrabold text-berry border-2 border-berry/30 bg-berry/10 active:scale-[0.98] transition-transform">
-            <LogOut className="h-5 w-5" /> {t('sign_out')}
-          </button>
+          <div className="p-4">
+            <button
+              onClick={() => {
+                logout();
+                navigateToLogin();
+              }}
+              className="flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl w-full font-extrabold text-berry border-2 border-berry/30 bg-berry/10 active:scale-[0.98] transition-transform">
+              <LogOut className="h-5 w-5" /> {t('sign_out')}
+            </button>
+          </div>
         </div>
       </aside>
     </div>

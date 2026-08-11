@@ -14,10 +14,10 @@ export default function VerifiedAdvisories() {
   return (
     <div className="space-y-4">
       <PageHeader title={t('verified_advisories')} subtitle={isHindi ? 'सत्यापित स्रोत' : 'From verified sources'} />
-      {verifiedAdvisories.map((a) => {
+      {verifiedAdvisories.map((a, i) => {
         const open = Boolean(expanded[a.id]);
         return (
-          <GlassCard key={a.id} className="p-4 animate-fade-up">
+          <GlassCard key={a.id} className={`p-4 animate-fade-up stagger-${i + 1}`}>
             <div className="flex items-center gap-2 mb-2">
               <StatusChip tone="green" icon={BadgeCheck}>{a.src}</StatusChip>
               <span className="text-[10px] text-muted-foreground ml-auto">{a.time}</span>
@@ -36,7 +36,7 @@ export default function VerifiedAdvisories() {
           </GlassCard>
         );
       })}
-      <GlassCard className="p-4 text-center animate-fade-up">
+      <GlassCard className="p-4 text-center animate-fade-up stagger-10">
         <p className="text-xs text-muted-foreground">{isHindi ? 'केवल सत्यापित सलाह — कोई सोशल फ़ीड नहीं।' : 'Verified advisories only — no social feed.'}</p>
       </GlassCard>
     </div>

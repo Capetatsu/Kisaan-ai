@@ -3,7 +3,6 @@ import { useOutletContext } from 'react-router-dom';
 import { Menu, Sun, Moon, Globe, User } from 'lucide-react';
 import { useLang } from '@/lib/languageContext';
 import { useTheme } from '@/lib/themeContext';
-import { farmer } from '@/lib/mockData';
 import OfflineIndicator from '@/components/ui/OfflineIndicator';
 
 export default function PageHeader({ title, subtitle }) {
@@ -35,21 +34,24 @@ export default function PageHeader({ title, subtitle }) {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={openLanguage}
-            className="grid place-items-center h-11 w-11 rounded-xl bg-card border-2 border-border shadow-duo active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            className="grid place-items-center h-11 w-11 rounded-xl bg-card border-2 border-border active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            style={{ boxShadow: '0 2px 8px -2px rgba(0,0,0,0.12), 0 1px 2px -1px rgba(0,0,0,0.08)' }}
             aria-label={t('language')}
           >
             <Globe className="h-5 w-5 text-water" strokeWidth={2.4} />
           </button>
           <button
             onClick={toggleTheme}
-            className="grid place-items-center h-11 w-11 rounded-xl bg-card border-2 border-border shadow-duo active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            className="grid place-items-center h-11 w-11 rounded-xl bg-card border-2 border-border active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            style={{ boxShadow: '0 2px 8px -2px rgba(0,0,0,0.12), 0 1px 2px -1px rgba(0,0,0,0.08)' }}
             aria-label="theme"
           >
             {theme === 'dark' ? <Sun className="h-5 w-5 text-sun" strokeWidth={2.4} /> : <Moon className="h-5 w-5 text-accent" strokeWidth={2.4} />}
           </button>
           <button
             onClick={openMenu}
-            className="grid place-items-center h-11 w-11 rounded-xl bg-primary text-white border-2 border-primary-edge shadow-duo active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            className="grid place-items-center h-11 w-11 rounded-xl bg-primary text-white border-2 border-primary-edge active:translate-y-[2px] active:shadow-none transition-all tap-target"
+            style={{ boxShadow: '0 2px 8px -2px rgba(0,0,0,0.15), 0 1px 2px -1px rgba(0,0,0,0.1)' }}
             aria-label={t('nav_menu')}
           >
             <Menu className="h-5 w-5" strokeWidth={2.6} />

@@ -20,7 +20,8 @@ export default function RecommendationCard({ rec, isHindi }) {
   const reason = isHindi && rec.reasonHi ? rec.reasonHi : rec.reason;
 
   return (
-    <div className="rounded-3xl bg-accent text-white p-5 animate-fade-up border-4 border-accent-edge relative overflow-hidden">
+    <div className="rounded-3xl text-white p-5 animate-fade-up border-4 relative overflow-hidden"
+      style={{ backgroundColor: 'hsl(var(--hero-accent))', borderColor: 'hsl(var(--accent-edge))' }}>
       <div className="absolute -right-6 -bottom-8 opacity-25">
         <KisaanMascot mood="thinking" className="w-32 h-32" />
       </div>

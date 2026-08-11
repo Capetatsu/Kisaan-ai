@@ -193,7 +193,7 @@ export default function FarmDetail() {
           ) : (
             <div className="space-y-3">
               {crops.map((crop, index) => (
-                <GlassCard key={crop.id} className="p-4 animate-fade-up" style={{ animationDelay: `${index * 40}ms` }}>
+                <GlassCard key={crop.id} className={`p-4 animate-fade-up stagger-${Math.min(index + 1, 10)}`}>
                   <div className="flex items-center gap-3">
                     <span className="grid place-items-center h-12 w-12 rounded-2xl bg-primary/12 text-2xl shrink-0">
                       {cropEmojis[crop.name.toLowerCase()] || '🌱'}

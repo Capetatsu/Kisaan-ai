@@ -91,7 +91,8 @@ export default function Market() {
       <PageHeader title={t('nav_market')} subtitle={nearbyMandi.name} />
 
       {/* Hero — big blue price section */}
-      <div className="rounded-3xl overflow-hidden animate-fade-up bg-water border-4 border-water-edge text-white relative">
+      <div className="rounded-3xl overflow-hidden animate-fade-up stagger-1 border-4 text-white relative"
+        style={{ backgroundColor: 'hsl(var(--hero-water))', borderColor: 'hsl(var(--water-edge))' }}>
         <div className="px-5 pt-5 pb-4">
           <div className="flex items-start justify-between">
             <div>
@@ -119,7 +120,7 @@ export default function Market() {
       </div>
 
       {/* Suggestion — colored action card */}
-      <div className={`rounded-2xl border-[3px] p-4 flex items-center gap-3 animate-fade-up ${suggCard[active.suggestion]}`}>
+      <div className={`rounded-2xl border-[3px] p-4 flex items-center gap-3 animate-fade-up stagger-2 ${suggCard[active.suggestion]}`}>
         <span className="grid place-items-center h-12 w-12 rounded-xl bg-white shrink-0 border-2 border-current">
           <ArrowRight className="h-6 w-6" strokeWidth={2.8} />
         </span>
@@ -132,7 +133,7 @@ export default function Market() {
 
       {/* Best sell time + mandi */}
       <div className="grid grid-cols-2 gap-3">
-        <GlassCard className="p-4 flex flex-col gap-2 animate-fade-up">
+        <GlassCard className="p-4 flex flex-col gap-2 animate-fade-up stagger-3">
           <span className="grid place-items-center h-10 w-10 rounded-xl bg-sun/20 text-sun shrink-0">
             <Clock className="h-5 w-5" strokeWidth={2.5} />
           </span>
@@ -141,7 +142,7 @@ export default function Market() {
             <p className="font-extrabold text-sm">{isHindi ? 'आज शाम 4–6 बजे' : 'Today, 4–6 PM'}</p>
           </div>
         </GlassCard>
-        <GlassCard className="p-4 flex flex-col gap-2 animate-fade-up">
+        <GlassCard className="p-4 flex flex-col gap-2 animate-fade-up stagger-4">
           <span className="grid place-items-center h-10 w-10 rounded-xl bg-primary/12 text-primary shrink-0">
             <MapPin className="h-5 w-5" strokeWidth={2.5} />
           </span>

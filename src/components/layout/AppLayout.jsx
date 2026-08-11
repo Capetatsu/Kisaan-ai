@@ -9,7 +9,7 @@ export default function AppLayout() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [seniorMode, setSeniorMode] = useState(false);
-  const [aiNavOpen, setAiNavOpen] = useState(false);
+  const [aiNavOpen, setAiNavOpen] = useState(true);
 
   const openMenu = () => setMenuOpen(true);
   const openLanguage = () => setLangOpen(true);

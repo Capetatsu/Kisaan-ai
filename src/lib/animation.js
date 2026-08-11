@@ -19,8 +19,18 @@ export const gentle = {
   easing: cubicBezier(0.25, 0.46, 0.45, 0.94),
 };
 
+function isValidTarget(t) {
+  if (!t) return false;
+  if (typeof t === 'string') return true;
+  if (t instanceof Element) return true;
+  if (Array.isArray(t)) return t.length > 0;
+  if (typeof t === 'object' && typeof t.value !== 'undefined') return true;
+  return false;
+}
+
 export function animateEntrance(targets, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(targets)) return Promise.resolve();
   return anime(targets, {
     opacity: [0, 1],
     translateY: [12, 0],
@@ -32,6 +42,7 @@ export function animateEntrance(targets, options = {}) {
 
 export function animateStaggerEntrance(targets, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(targets)) return Promise.resolve();
   return anime(targets, {
     opacity: [0, 1],
     translateY: [16, 0],
@@ -44,6 +55,7 @@ export function animateStaggerEntrance(targets, options = {}) {
 
 export function animateScalePop(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     scale: [0.92, 1.06, 1],
     duration: 320,
@@ -54,6 +66,7 @@ export function animateScalePop(target, options = {}) {
 
 export function animatePress(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     scale: 0.96,
     duration: 80,
@@ -64,6 +77,7 @@ export function animatePress(target, options = {}) {
 
 export function animateRelease(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     scale: 1,
     duration: 180,
@@ -74,6 +88,7 @@ export function animateRelease(target, options = {}) {
 
 export function animateProgress(target, value, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     width: `${value}%`,
     duration: 600,
@@ -100,6 +115,7 @@ export function animateCount(target, from, to, options = {}) {
 
 export function animateSlideFadeIn(target, direction = 'up', options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   const translateMap = {
     up: [16, 0],
     down: [-16, 0],
@@ -117,6 +133,7 @@ export function animateSlideFadeIn(target, direction = 'up', options = {}) {
 
 export function animateSlideFadeOut(target, direction = 'up', options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   const translateMap = {
     up: [0, -16],
     down: [0, 16],
@@ -134,6 +151,7 @@ export function animateSlideFadeOut(target, direction = 'up', options = {}) {
 
 export function animateFloat(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     translateY: [0, -6, 0],
     duration: 3500,
@@ -145,6 +163,7 @@ export function animateFloat(target, options = {}) {
 
 export function animateBreathe(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     scale: [1, 1.02, 1],
     duration: 4000,
@@ -156,6 +175,7 @@ export function animateBreathe(target, options = {}) {
 
 export function animateSuccessBurst(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     scale: [1, 1.15, 1],
     rotate: [-3, 3, -2, 2, 0],
@@ -167,6 +187,7 @@ export function animateSuccessBurst(target, options = {}) {
 
 export function animateShake(target, options = {}) {
   if (prefersReducedMotion()) return Promise.resolve();
+  if (!isValidTarget(target)) return Promise.resolve();
   return anime(target, {
     translateX: [-6, 6, -5, 5, -3, 3, 0],
     duration: 450,
@@ -197,6 +218,8 @@ export function useScrollReveal(options = {}) {
   const elementRef = useRef(null);
   const animatedRef = useRef(false);
   const transformedRef = useRef(false);
+  const optionsRef = useRef(options);
+  optionsRef.current = options;
 
   useEffect(() => {
     const el = elementRef.current;
@@ -204,7 +227,7 @@ export function useScrollReveal(options = {}) {
     if (prefersReducedMotion()) {
       el.style.opacity = '1';
       el.style.transform = 'none';
-      if (options.onComplete) options.onComplete();
+      if (optionsRef.current.onComplete) optionsRef.current.onComplete();
       return;
     }
     const observer = new IntersectionObserver((entries) => {
@@ -214,8 +237,8 @@ export function useScrollReveal(options = {}) {
           animatedRef.current = true;
           el.style.opacity = '1';
           el.style.transform = 'none';
-          animateEntrance(el, { delay: options.delay || 0 }).then(() => {
-            if (options.onComplete) options.onComplete();
+          animateEntrance(el, { delay: optionsRef.current.delay || 0 }).then(() => {
+            if (optionsRef.current.onComplete) optionsRef.current.onComplete();
           });
           if (once) observer.unobserve(el);
         }
@@ -223,7 +246,7 @@ export function useScrollReveal(options = {}) {
     }, { threshold, rootMargin });
     observer.observe(el);
     return () => observer.disconnect();
-  }, [threshold, rootMargin, once, options.delay, options.onComplete]);
+  }, [threshold, rootMargin, once]);
 
   const callbackRef = useCallback((el) => {
     if (el) {

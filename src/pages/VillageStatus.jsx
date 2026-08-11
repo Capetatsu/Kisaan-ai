@@ -41,7 +41,7 @@ export default function VillageStatus() {
   return (
     <div className="space-y-4">
       <PageHeader title={t('village_status')} subtitle="Dharampuri · Indore" />
-      <GlassCard strong className="p-5 animate-fade-up">
+      <GlassCard strong className="p-5 animate-fade-up stagger-1">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-muted-foreground">{isHindi ? 'जल स्तर' : 'Water level'}</p>
@@ -56,15 +56,15 @@ export default function VillageStatus() {
         </div>
       </GlassCard>
       <div className="grid grid-cols-2 gap-3">
-        {stats.map(({ Icon, label, labelHi, value }) => (
-          <GlassCard key={label} className="p-4 animate-fade-up">
+        {stats.map(({ Icon, label, labelHi, value }, i) => (
+          <GlassCard key={label} className={`p-4 animate-fade-up stagger-${i + 2}`}>
             <Icon className="h-5 w-5 text-primary mb-2" />
             <p className="text-2xl font-bold font-heading"><CountUp to={value} /></p>
             <p className="text-xs text-muted-foreground">{isHindi ? labelHi : label}</p>
           </GlassCard>
         ))}
       </div>
-      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up">
+      <GlassCard className="p-4 flex items-center gap-3 animate-fade-up stagger-6">
         <StatusChip tone="amber" pulse>{villageStats.activeAlerts} {isHindi ? 'सक्रिय अलर्ट' : 'active alerts'}</StatusChip>
         <p className="text-xs text-muted-foreground">{isHindi ? 'आसपास कीट प्रकोप रिपोर्ट' : 'Pest outbreak reported nearby'}</p>
       </GlassCard>

@@ -26,7 +26,7 @@ export default function VoiceButton() {
               <button
                 onClick={() => setListening(false)}
                 className="relative grid place-items-center h-20 w-20 rounded-full bg-primary text-white border-4 border-primary-edge voice-glow animate-pulse-glow active:scale-95 transition-transform"
-                style={{ borderBottomWidth: 10 }}
+                style={{ boxShadow: '0 4px 16px -2px rgba(0,0,0,0.25), 0 2px 6px -1px rgba(0,0,0,0.15)', borderBottomWidth: 10 }}
               >
                 <Mic className="h-8 w-8" />
               </button>
@@ -44,8 +44,8 @@ export default function VoiceButton() {
       <button
         onClick={() => setListening(true)}
         aria-label={t('tap_to_speak')}
-        className="fixed z-40 right-5 bottom-28 grid place-items-center h-14 w-14 rounded-full bg-primary text-white border-4 border-primary-edge shadow-duo-lg active:translate-y-[3px] active:shadow-none transition-all tap-target"
-        style={{ borderBottomWidth: 7 }}
+        className="fixed z-40 right-5 bottom-28 grid place-items-center h-14 w-14 rounded-full bg-primary text-white border-4 border-primary-edge active:translate-y-[3px] active:shadow-none transition-all tap-target"
+        style={{ boxShadow: '0 4px 12px -2px rgba(0,0,0,0.2), 0 2px 4px -1px rgba(0,0,0,0.12)', borderBottomWidth: 7 }}
       >
         <Mic className="h-6 w-6" strokeWidth={2.6} />
       </button>
